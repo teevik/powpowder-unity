@@ -2,7 +2,8 @@
 {
     None = 0,
     Stone = 1,
-    Sand = 2
+    Sand = 2,
+    Water = 3
 }
 
 public struct Cell

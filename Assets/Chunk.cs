@@ -1,96 +1,42 @@
+using System;
 using Unity.Collections;
+using Unity.Mathematics;
 
-public struct Chunk
+public struct Chunk : IDisposable
 {
-    public NativeArray<Cell> Cells;
+    private const int chunkSize = WorldGrid.ChunkSize;
 
-    public readonly Chunk Clone(Allocator allocator)
+    private readonly bool isOutOfBounds;
+    private NativeArray<Cell> cells;
+
+    public NativeArray<Cell> Cells => cells;
+
+    public bool IsOutOfBounds => isOutOfBounds;
+
+    public Chunk(Allocator allocator, bool isOutOfBounds = false)
     {
-        var clonedCells = new NativeArray<Cell>(Cells.Length, allocator);
+        cells = new NativeArray<Cell>(isOutOfBounds ? 0 : (chunkSize * chunkSize), allocator);
+        this.isOutOfBounds = isOutOfBounds;
+    }
 
-        Cells.CopyTo(clonedCells);
+    public static Chunk CreateOutOfBoundsChunk(Allocator allocator)
+    {
+        return new Chunk(allocator, true);
+    }
 
-        return new Chunk
-        {
-            Cells = clonedCells
-        };
+    public readonly Cell GetCell(int2 cellPosition)
+    {
+        return cells[cellPosition.x + (cellPosition.y * chunkSize)];
+    }
+    
+    public readonly void SetCell(int2 cellPosition, Cell cell)
+    {
+        var cellsCopy = cells;
+        cellsCopy[cellPosition.x + (cellPosition.y * chunkSize)] = cell;
+    }
+
+    public void Dispose()
+    {
+        cells.Dispose();
     }
 }
-
-
-
-
-
-// using System.Collections;
-//
-// public struct Chunk
-// {
-//     [SerializeField] private ComputeShader computeShader;
-//     [SerializeField] private float simulationStep;
-//
-//     private MeshRenderer renderer;
-//     private Cell[] cells;
-//     private ComputeBuffer cellsBuffer;
-//     private int kernelIndex;
-//     private RenderTexture outputRenderTexture;
-//
-//     private bool requiresRender = false;
-//     
-//     private void Awake()
-//     {
-//         renderer = GetComponent<MeshRenderer>();
-//     }
-//
-//     private void Start()
-//     {
-//         outputRenderTexture = new RenderTexture(64, 64, 32)
-//         {
-//             enableRandomWrite = true,
-//             useMipMap = false,
-//             filterMode = FilterMode.Point
-//         };
-//         
-//         outputRenderTexture.Create();
-//
-//         cells = new Cell[64 * 64];
-//         
-//         cellsBuffer = new ComputeBuffer(cells.Length, 128);
-//         
-//         kernelIndex = computeShader.FindKernel("render_chunk");
-//
-//         renderer.material.mainTexture = outputRenderTexture;
-//
-//         StartCoroutine(UpdateWorldCoroutine());
-//     }
-//
-//     private IEnumerator UpdateWorldCoroutine()
-//     {
-//         while (true)
-//         {
-//             for (var i = 0; i < cells.Length; i++)
-//             {
-//                 var cell = cells[i];
-//                 cell.type = (Random.value > 0.5) ? CellType.Stone : CellType.Sand;
-//                 cells[i] = cell;
-//             }
-//
-//             requiresRender = true;
-//
-//             yield return new WaitForSeconds(simulationStep);
-//         }
-//     }
-//     
-//     private void Update()
-//     {
-//         if (requiresRender)
-//         {
-//             cellsBuffer.SetData(cells);
-//             computeShader.SetBuffer(kernelIndex, "cells", cellsBuffer);
-//             computeShader.SetTexture(kernelIndex, "texture_out", outputRenderTexture);
-//
-//             computeShader.Dispatch(kernelIndex, 8, 8, 1);
-//
-//             requiresRender = false;
-//         }
-//     }
-// }
