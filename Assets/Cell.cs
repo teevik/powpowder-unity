@@ -1,7 +1,8 @@
 ﻿public enum CellType : uint
 {
-    Stone = 0,
-    Sand = 1
+    None = 0,
+    Stone = 1,
+    Sand = 2
 }
 
 public struct Cell

@@ -1,6 +1,20 @@
+using Unity.Collections;
+
 public struct Chunk
 {
-    public Cell[] Cells;
+    public NativeArray<Cell> Cells;
+
+    public readonly Chunk Clone(Allocator allocator)
+    {
+        var clonedCells = new NativeArray<Cell>(Cells.Length, allocator);
+
+        Cells.CopyTo(clonedCells);
+
+        return new Chunk
+        {
+            Cells = clonedCells
+        };
+    }
 }
 
 
