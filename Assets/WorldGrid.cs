@@ -13,6 +13,48 @@ using Random = UnityEngine.Random;
 using static Unity.Mathematics.math;
 using int2 = Unity.Mathematics.int2;
 
+public struct ChunkCollectionWithNeighbors
+{
+    public ChunkContainer Chunk;
+    public ChunkContainer? North;
+    public ChunkContainer? NorthEast;
+    public ChunkContainer? East;
+    public ChunkContainer? SouthEast;
+    public ChunkContainer? South;
+    public ChunkContainer? SouthWest;
+    public ChunkContainer? West;
+    public ChunkContainer? NorthWest;
+
+    public readonly ChunkContainer? ChunkFromPosition(int2 position)
+    {
+        if (position.Equals(int2(0, 0))) return Chunk;
+        if (position.Equals(int2(0, 1))) return North;
+        if (position.Equals(int2(1, 1))) return NorthEast;
+        if (position.Equals(int2(1, 0))) return East;
+        if (position.Equals(int2(1, -1))) return SouthEast;
+        if (position.Equals(int2(0, -1))) return South;
+        if (position.Equals(int2(-1, -1))) return SouthWest;
+        if (position.Equals(int2(-1, 0))) return West;
+        if (position.Equals(int2(-1, 1))) return NorthWest;
+            
+        throw new ArgumentException("Wrong argument bro", nameof(position));
+    }
+        
+    public void SetChunkAtPosition(int2 position, ChunkContainer chunk)
+    {
+        if (position.Equals(int2(0, 0))) Chunk = chunk;
+        else if (position.Equals(int2(0, 1))) North = chunk;
+        else if (position.Equals(int2(1, 1))) NorthEast = chunk;
+        else if (position.Equals(int2(1, 0))) East = chunk;
+        else if (position.Equals(int2(1, -1))) SouthEast = chunk;
+        else if (position.Equals(int2(0, -1))) South = chunk;
+        else if (position.Equals(int2(-1, -1))) SouthWest = chunk;
+        else if (position.Equals(int2(-1, 0))) West = chunk;
+        else if (position.Equals(int2(-1, 1))) NorthWest = chunk;
+        else throw new ArgumentException("Wrong argument bro", nameof(position));
+    }
+}
+
 public struct ChunkWithNeighbors
 {
     public Chunk Chunk;
@@ -55,18 +97,17 @@ public struct ChunkWithNeighbors
     }
 }
 
+public class ChunkContainer
+{
+    public Chunk Chunk;
+    public MeshRenderer Renderer;
+    public ComputeBuffer CellsComputeBuffer;
+    public RenderTexture OutputRenderTexture;
+    public bool RequiresRedraw;
+}
 
 public class WorldGrid : MonoBehaviour
 {
-    private class ChunkContainer
-    {
-        public Chunk Chunk;
-        public MeshRenderer Renderer;
-        public ComputeBuffer CellsComputeBuffer;
-        public RenderTexture OutputRenderTexture;
-        public bool RequiresRedraw;
-    }
-    
     public const int ChunkSize = 128;
     
     [SerializeField] private ComputeShader computeShader;
@@ -305,7 +346,9 @@ public class WorldGrid : MonoBehaviour
              {
                  for (int j = 0; j < 2; j++)
                  {
-                     JobHandle? jobHandle = null;
+                     // JobHandle? jobHandle = null;
+                     var jobHandles = new List<JobHandle>();
+                     var 
                      
                      for (var chunkX = minChunkX; chunkX <= maxChunkX; chunkX++)
                      {
@@ -315,131 +358,142 @@ public class WorldGrid : MonoBehaviour
                              
                              var chunkPosition = int2(chunkX, chunkY);
                              var chunkContainer = chunkContainers[chunkPosition];
-
-                             // chunkContainer.RequiresRedraw = true;
-
-                             // var cells = chunkContainer.Chunk.Cells;
                              
-                             var northChunkContainer = chunkContainers.TryGetValue(chunkPosition + int2(0, 1));
-                             var northEastChunkContainer = chunkContainers.TryGetValue(chunkPosition + int2(1, 1));
-                             var eastChunkContainer = chunkContainers.TryGetValue(chunkPosition + int2(1, 0));
-                             var southEastChunkContainer = chunkContainers.TryGetValue(chunkPosition + int2(1, -1));
-                             var southChunkContainer = chunkContainers.TryGetValue(chunkPosition + int2(0, -1));
-                             var southWestChunkContainer = chunkContainers.TryGetValue(chunkPosition + int2(-1, -1));
-                             var westChunkContainer = chunkContainers.TryGetValue(chunkPosition + int2(-1, 0));
-                             var northWestChunkContainer = chunkContainers.TryGetValue(chunkPosition + int2(-1, 1));
+                             var chunkContainersWithNeighbors = new ChunkCollectionWithNeighbors
+                             {
+                                 Chunk = chunkContainer,
+                                 North = chunkContainers.TryGetValue(chunkPosition + int2(0, 1)),
+                                 NorthEast = chunkContainers.TryGetValue(chunkPosition + int2(1, 1)),
+                                 East = chunkContainers.TryGetValue(chunkPosition + int2(1, 0)),
+                                 SouthEast = chunkContainers.TryGetValue(chunkPosition + int2(1, -1)),
+                                 South = chunkContainers.TryGetValue(chunkPosition + int2(0, -1)),
+                                 SouthWest = chunkContainers.TryGetValue(chunkPosition + int2(-1, -1)),
+                                 West = chunkContainers.TryGetValue(chunkPosition + int2(-1, 0)),
+                                 NorthWest = chunkContainers.TryGetValue(chunkPosition + int2(-1, 1)),
+                             };
 
                              var chunkWithNeighbors = new ChunkWithNeighbors
                              {
                                  Chunk = chunkContainer.Chunk,
-                                 North = northChunkContainer?.Chunk ?? Chunk.CreateOutOfBoundsChunk(Allocator.TempJob),
-                                 NorthEast = northEastChunkContainer?.Chunk ?? Chunk.CreateOutOfBoundsChunk(Allocator.TempJob),
-                                 East = eastChunkContainer?.Chunk ?? Chunk.CreateOutOfBoundsChunk(Allocator.TempJob),
-                                 SouthEast = southEastChunkContainer?.Chunk ?? Chunk.CreateOutOfBoundsChunk(Allocator.TempJob),
-                                 South = southChunkContainer?.Chunk ?? Chunk.CreateOutOfBoundsChunk(Allocator.TempJob),
-                                 SouthWest = southWestChunkContainer?.Chunk ?? Chunk.CreateOutOfBoundsChunk(Allocator.TempJob),
-                                 West = westChunkContainer?.Chunk ?? Chunk.CreateOutOfBoundsChunk(Allocator.TempJob),
-                                 NorthWest = northWestChunkContainer?.Chunk ?? Chunk.CreateOutOfBoundsChunk(Allocator.TempJob)
+                                 North = chunkContainersWithNeighbors.North?.Chunk ?? Chunk.CreateOutOfBoundsChunk(Allocator.TempJob),
+                                 NorthEast = chunkContainersWithNeighbors.NorthEast?.Chunk ?? Chunk.CreateOutOfBoundsChunk(Allocator.TempJob),
+                                 East = chunkContainersWithNeighbors.East?.Chunk ?? Chunk.CreateOutOfBoundsChunk(Allocator.TempJob),
+                                 SouthEast = chunkContainersWithNeighbors.SouthEast?.Chunk ?? Chunk.CreateOutOfBoundsChunk(Allocator.TempJob),
+                                 South = chunkContainersWithNeighbors.South?.Chunk ?? Chunk.CreateOutOfBoundsChunk(Allocator.TempJob),
+                                 SouthWest = chunkContainersWithNeighbors.SouthWest?.Chunk ?? Chunk.CreateOutOfBoundsChunk(Allocator.TempJob),
+                                 West = chunkContainersWithNeighbors.West?.Chunk ?? Chunk.CreateOutOfBoundsChunk(Allocator.TempJob),
+                                 NorthWest = chunkContainersWithNeighbors.NorthWest?.Chunk ?? Chunk.CreateOutOfBoundsChunk(Allocator.TempJob)
                              };
                              
                              var resultNeedsRedraw = new NativeArray<bool>(1, Allocator.TempJob);
                              
                              var job = new SomeJob(chunkWithNeighbors, resultNeedsRedraw, (uint) Time.frameCount, new Unity.Mathematics.Random((uint)random.Next()));
-                             var newJobHandle = job.Schedule();
-                             if (jobHandle == null) jobHandle = newJobHandle;
-                             else jobHandle = JobHandle.CombineDependencies(jobHandle.Value, newJobHandle);
+                             var jobHandle = job.Schedule();
+                             jobHandles.Add(jobHandle);
+                             // if (jobHandle == null) jobHandle = newJobHandle;
+                             // else jobHandle = JobHandle.CombineDependencies(jobHandle.Value, newJobHandle);
 
-                             if (resultNeedsRedraw[0])
-                             {
-                                 chunkContainer.RequiresRedraw = true;
+                             // var newJobHandle = job.Schedule();
+                             // if (jobHandle == null) jobHandle = newJobHandle;
+                             // else jobHandle = JobHandle.CombineDependencies(jobHandle.Value, newJobHandle);
 
-                                 if (northChunkContainer != null)
-                                 {
-                                     northChunkContainer.RequiresRedraw = true;
-                                 }
+                             
+                             // if (resultNeedsRedraw[0])
+                             // {
+                             //     chunkContainer.RequiresRedraw = true;
+                             //
+                             //     if (northChunkContainer != null)
+                             //     {
+                             //         northChunkContainer.RequiresRedraw = true;
+                             //     }
+                             //
+                             //     if (northEastChunkContainer != null)
+                             //     {
+                             //         northEastChunkContainer.RequiresRedraw = true;
+                             //     }
+                             //
+                             //     if (eastChunkContainer != null)
+                             //     {
+                             //         eastChunkContainer.RequiresRedraw = true;
+                             //     }
+                             //     
+                             //     if (southEastChunkContainer != null)
+                             //     {
+                             //         southEastChunkContainer.RequiresRedraw = true;
+                             //     }
+                             //
+                             //     if (southChunkContainer != null)
+                             //     {
+                             //         southChunkContainer.RequiresRedraw = true;
+                             //     }
+                             //
+                             //     if (southWestChunkContainer != null)
+                             //     {
+                             //         southWestChunkContainer.RequiresRedraw = true;
+                             //     }
+                             //
+                             //     if (westChunkContainer != null)
+                             //     {
+                             //         westChunkContainer.RequiresRedraw = true;
+                             //     }
+                             //
+                             //     if (northWestChunkContainer != null)
+                             //     {
+                             //         northWestChunkContainer.RequiresRedraw = true;
+                             //     }
+                             //
+                             // }
+                             //
+                             // if (northChunkContainer == null)
+                             // {
+                             //     chunkWithNeighbors.North.Dispose();
+                             // }
+                             //
+                             // if (northEastChunkContainer == null)
+                             // {
+                             //     chunkWithNeighbors.NorthEast.Dispose();
+                             // }
+                             //
+                             // if (eastChunkContainer == null)
+                             // {
+                             //     chunkWithNeighbors.East.Dispose();
+                             // }
+                             //
+                             // if (southEastChunkContainer == null)
+                             // {
+                             //     chunkWithNeighbors.SouthEast.Dispose();
+                             // }
+                             //
+                             // if (southChunkContainer == null)
+                             // {
+                             //     chunkWithNeighbors.South.Dispose();
+                             // }
+                             //
+                             // if (southWestChunkContainer == null)
+                             // {
+                             //     chunkWithNeighbors.SouthWest.Dispose();
+                             // }
+                             //
+                             // if (westChunkContainer == null)
+                             // {
+                             //     chunkWithNeighbors.West.Dispose();
+                             // }
+                             //
+                             // if (northWestChunkContainer == null)
+                             // {
+                             //     chunkWithNeighbors.NorthWest.Dispose();
+                             // }
 
-                                 if (northEastChunkContainer != null)
-                                 {
-                                     northEastChunkContainer.RequiresRedraw = true;
-                                 }
-
-                                 if (eastChunkContainer != null)
-                                 {
-                                     eastChunkContainer.RequiresRedraw = true;
-                                 }
-                                 
-                                 if (southEastChunkContainer != null)
-                                 {
-                                     southEastChunkContainer.RequiresRedraw = true;
-                                 }
-
-                                 if (southChunkContainer != null)
-                                 {
-                                     southChunkContainer.RequiresRedraw = true;
-                                 }
-
-                                 if (southWestChunkContainer != null)
-                                 {
-                                     southWestChunkContainer.RequiresRedraw = true;
-                                 }
-
-                                 if (westChunkContainer != null)
-                                 {
-                                     westChunkContainer.RequiresRedraw = true;
-                                 }
-
-                                 if (northWestChunkContainer != null)
-                                 {
-                                     northWestChunkContainer.RequiresRedraw = true;
-                                 }
-
-                             }
-
-                             if (northChunkContainer == null)
-                             {
-                                 chunkWithNeighbors.North.Dispose();
-                             }
-
-                             if (northEastChunkContainer == null)
-                             {
-                                 chunkWithNeighbors.NorthEast.Dispose();
-                             }
-
-                             if (eastChunkContainer == null)
-                             {
-                                 chunkWithNeighbors.East.Dispose();
-                             }
-
-                             if (southEastChunkContainer == null)
-                             {
-                                 chunkWithNeighbors.SouthEast.Dispose();
-                             }
-
-                             if (southChunkContainer == null)
-                             {
-                                 chunkWithNeighbors.South.Dispose();
-                             }
-
-                             if (southWestChunkContainer == null)
-                             {
-                                 chunkWithNeighbors.SouthWest.Dispose();
-                             }
-
-                             if (westChunkContainer == null)
-                             {
-                                 chunkWithNeighbors.West.Dispose();
-                             }
-
-                             if (northWestChunkContainer == null)
-                             {
-                                 chunkWithNeighbors.NorthWest.Dispose();
-                             }
-
-                             resultNeedsRedraw.Dispose();
+                             // resultNeedsRedraw.Dispose();
                          }
                      }
                      
-                     if (jobHandle != null) jobHandle.Value.Complete();
+                     // if (jobHandle != null) jobHandle.Value.Complete();
+
+                     var a = new NativeArray<JobHandle>(jobHandles.ToArray(), Allocator.Temp);
+                     JobHandle.CompleteAll(a);
+                     a.Dispose();
+                     // if (jobHandle != null) jobHandle.Value.Complete();
                      
                      yield return new WaitForSeconds(simulationStep);
                  }
