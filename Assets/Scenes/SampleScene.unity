@@ -238,7 +238,8 @@ MonoBehaviour:
   computeShader: {fileID: 7200000, guid: 680481ded41ff3a45a2770d78e2b7803, type: 3}
   simulationStep: 0.001
   chunkPrefab: {fileID: 8485033953509683617, guid: 0facde947bd8c06418aaad7ea44d3270, type: 3}
-  pixelsPerUnit: 32
+  pixelsPerUnit: 18
+  chunkAmountRadius: {x: 3, y: 2}
 --- !u!4 &703278566
 Transform:
   m_ObjectHideFlags: 0
