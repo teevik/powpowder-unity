@@ -4,6 +4,8 @@ struct Cell
     uint data1;
     uint data2;
     uint clock;
+    bool isStale;
+    float4 color;
 };
 
 int chunk_size;
@@ -18,7 +20,8 @@ void render_chunk(uint2 id : SV_DispatchThreadID)
 {
     Cell cell = cells[id.x + (id.y * chunk_size)];
     
-    float4 resultColor = cell_type_colors[cell.type];
+    // float4 resultColor = cell_type_colors[cell.type];
 
-    texture_out[id.xy] = resultColor;
+    // texture_out[id.xy] = resultColor;
+    texture_out[id.xy] = cell.color;
 }

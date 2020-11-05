@@ -2,5 +2,5 @@
 
 public interface ICellImplementation
 {
-    public bool Update(ChunkWithNeighbors chunkWithNeighbors, int2 cellPosition, Random random);
+    public bool Update(ValueWithNeighbors<Chunk> chunkWithNeighbors, int2 cellPosition, Random random);
 }

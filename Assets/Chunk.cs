@@ -1,5 +1,6 @@
 using System;
 using Unity.Collections;
+using Unity.Collections.LowLevel.Unsafe;
 using Unity.Mathematics;
 
 public struct Chunk : IDisposable
@@ -7,6 +8,7 @@ public struct Chunk : IDisposable
     private const int chunkSize = WorldGrid.ChunkSize;
 
     private readonly bool isOutOfBounds;
+    [NativeDisableContainerSafetyRestriction]
     private NativeArray<Cell> cells;
 
     public NativeArray<Cell> Cells => cells;

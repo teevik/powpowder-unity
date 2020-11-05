@@ -176,7 +176,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 5
+  orthographic size: 15.46
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -239,7 +239,7 @@ MonoBehaviour:
   simulationStep: 0.001
   chunkPrefab: {fileID: 8485033953509683617, guid: 0facde947bd8c06418aaad7ea44d3270, type: 3}
   pixelsPerUnit: 18
-  chunkAmountRadius: {x: 3, y: 2}
+  chunkAmountRadius: {x: 6, y: 4}
 --- !u!4 &703278566
 Transform:
   m_ObjectHideFlags: 0

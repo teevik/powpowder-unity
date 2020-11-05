@@ -4,7 +4,7 @@ public static class CellUtils
 {
     private const int chunkSize = WorldGrid.ChunkSize;
 
-    public static bool GetRelativeCellPosition(ChunkWithNeighbors chunkWithNeighbors, int2 cellPosition, out int2 relativeChunkPosition, out int2 relativeCellPosition)
+    public static bool GetRelativeCellPosition(ValueWithNeighbors<Chunk> chunkWithNeighbors, int2 cellPosition, out int2 relativeChunkPosition, out int2 relativeCellPosition)
     {
         var chunkOffset = math.int2(math.floor(math.float2(cellPosition) / math.float2(chunkSize, chunkSize)));
         var relativeTargetCell = (cellPosition - (chunkOffset * chunkSize));
@@ -23,7 +23,7 @@ public static class CellUtils
         return true;
     }
     
-    public static Cell? GetCellAtPosition(ChunkWithNeighbors chunkWithNeighbors, int2 cellPosition)
+    public static Cell? GetCellAtPosition(ValueWithNeighbors<Chunk> chunkWithNeighbors, int2 cellPosition)
     {
         if (GetRelativeCellPosition(chunkWithNeighbors, cellPosition, out var relativeChunkPosition, out var relativeCellPosition))
         {
@@ -48,7 +48,7 @@ public static class CellUtils
     //     }
     // }
     //
-    public static bool SwitchCells(ChunkWithNeighbors chunkWithNeighbors, int2 absoluteCurrentCellPosition,
+    public static bool SwitchCells(ValueWithNeighbors<Chunk> chunkWithNeighbors, int2 absoluteCurrentCellPosition,
         int2 offset)
     {
         if (!GetRelativeCellPosition(chunkWithNeighbors, absoluteCurrentCellPosition, out var oldChunkPosition,
@@ -56,7 +56,7 @@ public static class CellUtils
         if (!GetRelativeCellPosition(chunkWithNeighbors, absoluteCurrentCellPosition + offset, out var newChunkPosition,
             out var newCellPosition)) return false;
         
-        var oldCellChunk = chunkWithNeighbors.Chunk;
+        var oldCellChunk = chunkWithNeighbors.Value;
         var newCellChunk = chunkWithNeighbors.ChunkFromPosition(newChunkPosition);
     
         var oldCell = oldCellChunk.GetCell(oldCellPosition);
@@ -131,13 +131,13 @@ public static class CellUtils
     //     }
     // }
 
-    public static bool SwitchCellsIfTargetEmpty(ChunkWithNeighbors chunkWithNeighbors, int2 absoluteCurrentCellPosition, int2 absoluteTargetCellPosition)
+    public static bool SwitchCellsIfTargetEmpty(ValueWithNeighbors<Chunk> chunkWithNeighbors, int2 absoluteCurrentCellPosition, int2 absoluteTargetCellPosition)
     {
         if (GetRelativeCellPosition(chunkWithNeighbors, absoluteCurrentCellPosition, out var oldChunkPosition, out var oldCellPosition))
         {
             if (GetRelativeCellPosition(chunkWithNeighbors, absoluteTargetCellPosition, out var newChunkPosition, out var newCellPosition))
             {
-                var oldCellChunk = chunkWithNeighbors.Chunk;
+                var oldCellChunk = chunkWithNeighbors.Value;
                 var newCellChunk = chunkWithNeighbors.ChunkFromPosition(newChunkPosition);
 
                 var oldCell = oldCellChunk.GetCell(oldCellPosition);
