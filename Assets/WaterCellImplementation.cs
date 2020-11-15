@@ -4,8 +4,8 @@ using int2 = Unity.Mathematics.int2;
 
 public struct WaterCellImplementation : ICellImplementation
 {
-    private readonly static Lch WaterStartColor = new Lch(65f, 37f, 249f);
-    private readonly static Lch WaterEndColor = new Lch(70f, 37f, 249f);
+    private static readonly Lch WaterStartColor = new Lch(65f, 37f, 249f);
+    private static readonly Lch WaterEndColor = new Lch(70f, 37f, 249f);
 
     public static Cell CreateWaterCell(ref Random random)
     {

@@ -154,6 +154,7 @@
           <e p="Extensions" t="Include">
             <e p="DictionaryExtensions.cs" t="Include" />
           </e>
+          <e p="PlayerChunkLoader.cs" t="Include" />
         </e>
         <e p="WaterCellImplementation.cs" t="Include" />
         <e p="WorldGrid.cs" t="Include" />

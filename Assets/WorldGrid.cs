@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Drawing;
 using Extensions;
-using Sirenix.OdinInspector;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Jobs;
@@ -72,7 +71,6 @@ public class WorldGrid : MonoBehaviour
     [SerializeField] private float simulationStep;
     [SerializeField] private ChunkBehaviour chunkPrefab;
     [SerializeField] private float pixelsPerUnit;
-    [SerializeField] private Vector2Int chunkAmountRadius = Vector2Int.one;
 
     private readonly Dictionary<int2, ChunkContainer> chunkContainers = new Dictionary<int2, ChunkContainer>();
     private int renderChunkKernelIndex;
@@ -84,10 +82,70 @@ public class WorldGrid : MonoBehaviour
     private unsafe int SizeOfCell => sizeof(Cell);
     private unsafe int SizeOfColor => sizeof(Color);
 
-    private void Start()
+    public bool ChunkIsLoaded(int2 chunkPosition)
+    {
+        return chunkContainers.ContainsKey(chunkPosition);
+    }
+    
+    public void LoadChunk(int2 chunkPosition)
+    {
+        var chunkRenderer = Instantiate(chunkPrefab, transform, true);
+        chunkRenderer.transform.position = ChunkScale * new Vector3(chunkPosition.x, chunkPosition.y);
+        chunkRenderer.transform.localScale = new Vector3(ChunkScale, ChunkScale, 1);
+        
+        var outputRenderTexture = new RenderTexture(ChunkSize, ChunkSize, 32)
+        {
+            enableRandomWrite = true,
+            useMipMap = false,
+            filterMode = FilterMode.Point
+        };
+        
+        outputRenderTexture.Create();
+        
+        var chunk = new Chunk(Allocator.Persistent);
+
+        var cellsComputeBuffer = new ComputeBuffer(chunk.Cells.Length, SizeOfCell);
+        chunkRenderer.SetTexture(outputRenderTexture);
+
+        if (chunkPosition.y == 0)
+        {
+            for (var cellX = 0; cellX < ChunkSize; cellX++)
+            {
+                for (var cellY = 0; cellY < ChunkSize; cellY++)
+                {
+                    chunk.SetCell(int2(cellX, cellY), (Random.value > 0.5f) ? Cell.EmptyCell : SandCellImplementation.CreateSandCell(ref random));
+                }
+            }
+        }
+        else if (chunkPosition.y < 0)
+        {
+            for (var cellX = 0; cellX < ChunkSize; cellX++)
+            {
+                for (var cellY = 0; cellY < ChunkSize; cellY++)
+                {
+                    chunk.SetCell(int2(cellX, cellY), SandCellImplementation.CreateSandCell(ref random));
+                }
+            }
+        }
+        
+        var chunkContainer = new ChunkContainer
+        {
+            Chunk = chunk,
+            ChunkBehaviour = chunkRenderer,
+            CellsComputeBuffer = cellsComputeBuffer,
+            OutputRenderTexture = outputRenderTexture
+        };
+        
+        chunkContainers.Add(chunkPosition, chunkContainer);
+    }
+
+    private void Awake()
     {
         random = new Unity.Mathematics.Random((uint) new System.Random().Next());
+    }
 
+    private void Start()
+    {
         renderChunkKernelIndex = computeShader.FindKernel("render_chunk");
 
         cellTypeColorBuffer = new ComputeBuffer(4, SizeOfColor);
@@ -101,48 +159,6 @@ public class WorldGrid : MonoBehaviour
         
         computeShader.SetBuffer(renderChunkKernelIndex, "cell_type_colors", cellTypeColorBuffer);
         
-        for (var x = -chunkAmountRadius.x + 1; x < chunkAmountRadius.x; x++)
-        {
-            for (var y = -chunkAmountRadius.y + 1; y < chunkAmountRadius.y; y++)
-            {
-                var chunkRenderer = Instantiate(chunkPrefab, transform, true);
-                chunkRenderer.transform.position = ChunkScale * new Vector3(x, y);
-                chunkRenderer.transform.localScale = new Vector3(ChunkScale, ChunkScale, 1);
-                
-                var outputRenderTexture = new RenderTexture(ChunkSize, ChunkSize, 32)
-                {
-                    enableRandomWrite = true,
-                    useMipMap = false,
-                    filterMode = FilterMode.Point
-                };
-                
-                outputRenderTexture.Create();
-                
-                var chunk = new Chunk(Allocator.Persistent);
-
-                var cellsComputeBuffer = new ComputeBuffer(chunk.Cells.Length, SizeOfCell);
-                chunkRenderer.SetTexture(outputRenderTexture);
-                
-                for (var cellX = 0; cellX < ChunkSize; cellX++)
-                {
-                    for (var cellY = 0; cellY < ChunkSize; cellY++)
-                    {
-                        chunk.SetCell(int2(cellX, cellY), (Random.value > 0.5f) ? Cell.EmptyCell : SandCellImplementation.CreateSandCell(ref random));
-                    }
-                }
-
-                var chunkContainer = new ChunkContainer
-                {
-                    Chunk = chunk,
-                    ChunkBehaviour = chunkRenderer,
-                    CellsComputeBuffer = cellsComputeBuffer,
-                    OutputRenderTexture = outputRenderTexture
-                };
-                
-                chunkContainers.Add(int2(x, y), chunkContainer);
-            }
-        }
-
         StartCoroutine(UpdateWorldCoroutine());
     }
 
@@ -159,8 +175,21 @@ public class WorldGrid : MonoBehaviour
         }
     }
 
+    public int2 ChunkPosition(Vector2 worldPosition)
+    {
+        var absoluteCellCursorPositionVector = Vector2Int.RoundToInt(transform.InverseTransformPoint(worldPosition) * pixelsPerUnit);
+        var absoluteCellCursorPosition = int2(absoluteCellCursorPositionVector.x, absoluteCellCursorPositionVector.y) + (ChunkSize / 2);
+        
+        var chunkPosition = int2(floor(absoluteCellCursorPosition / (float2) ChunkSize));
+        // var cellPosition = offsetedCursorPosition - (chunkPosition * ChunkSize);
+
+        return chunkPosition;
+    }
+
     private void Update()
     {
+        if (chunkContainers.Count == 0) return;
+        
         if (Input.GetMouseButton(0))
         {
             var worldCursorPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
@@ -196,9 +225,7 @@ public class WorldGrid : MonoBehaviour
             for (var y = minY; y <= maxY; y++)
             {
                 var chunkPosition = int2(x, y);
-                var chunkContainer = chunkContainers[chunkPosition];
-                
-                if (chunkContainer == null) continue;
+                if (!chunkContainers.TryGetValue(chunkPosition, out var chunkContainer)) continue;
 
                 chunkContainer.CellsComputeBuffer.SetData(chunkContainer.Chunk.Cells);
 
@@ -479,10 +506,8 @@ public class WorldGrid : MonoBehaviour
                             if (!((abs(chunkX % 2) == i) || (abs(chunkY % 2) == j))) continue;
 
                             var chunkPosition = int2(chunkX, chunkY);
-                            var chunkContainer = chunkContainers[chunkPosition];
-
-                            if (chunkContainer == null) continue;
-
+                            if (!chunkContainers.TryGetValue(chunkPosition, out var chunkContainer)) continue;
+                            
                             var chunkContainersWithNeighbors = new ValueWithNeighbors<ChunkContainer?>
                             {
                                 Value = chunkContainer,
@@ -528,11 +553,11 @@ public class WorldGrid : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        for (var x = -chunkAmountRadius.x + 1; x < chunkAmountRadius.x; x++)
+        if (chunkContainers.Count > 0)
         {
-            for (var y = -chunkAmountRadius.y + 1; y < chunkAmountRadius.y; y++)
+            foreach (var chunkContainer in chunkContainers)
             {
-                Gizmos.DrawWireCube(new Vector3(x, y) * ChunkScale, new Vector3(ChunkScale, ChunkScale));
+                Gizmos.DrawWireCube(chunkContainer.Value.ChunkBehaviour.transform.position, new Vector3(ChunkScale, ChunkScale));
             }
         }
     }

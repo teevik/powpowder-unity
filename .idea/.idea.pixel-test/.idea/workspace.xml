@@ -23,23 +23,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="11ae6f55-283d-488c-a89b-fbda3698cb4a" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/Assets/ChunkBehaviour.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/ChunkBehaviour.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Editor/MeshRendererInspector.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Editor/MeshRendererInspector.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Editor/awdhawi.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Editor/awdhawi.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Scripts/PlayerChunkLoader.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.pixel-test/.idea/contentModel.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.pixel-test/.idea/contentModel.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.pixel-test/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.pixel-test/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/CellUtils.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/CellUtils.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Chunk.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Chunk.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/Chunk.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Prefabs/Chunk.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/SandCellImplementation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/SandCellImplementation.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scenes/SampleScene.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/SampleScene.unity" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/WaterCellImplementation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/WaterCellImplementation.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/WorldGrid.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/WorldGrid.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ProjectSettings/ProjectSettings.asset" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSettings/ProjectSettings.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ProjectSettings/TagManager.asset" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSettings/TagManager.asset" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -68,12 +57,10 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/9577AC7A-62EF-4317-9789-031239BA8798/88/8225671b/Random.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/7C72A31C-6717-401A-8F3A-6328E904D4C3/8a/4dbe3016/NativeArray`1.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/7C72A31C-6717-401A-8F3A-6328E904D4C3/42/1c066564/Color.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.collections@0.12.0-preview.13/Unity.Collections/UnsafeHashMap.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.mathematics@1.2.1/Unity.Mathematics/math.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/3F87D505-7260-4494-9200-1887E23EF996/db/0bb649b0/Editor.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/CACD6C6A-C61D-45CD-B58B-92E86EE53F52/d4/fdfcf7c4/ValueType.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.mathematics@1.2.1/Unity.Mathematics/int2.gen.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.collections@0.12.0-preview.13/Unity.Collections/NativeHashMap.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/93956656-A483-4524-8DE3-4C8B22BDF0A0/ea/28f57eeb/OdinEditor.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/7C72A31C-6717-401A-8F3A-6328E904D4C3/be/0cf82d4b/Vector2Int.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/7C72A31C-6717-401A-8F3A-6328E904D4C3/eb/1e65383c/Rect.cs" root0="SKIP_HIGHLIGHTING" />
@@ -96,14 +83,15 @@
         <option value="$PROJECT_DIR$/Assets/Chunk.cs" />
         <option value="$PROJECT_DIR$/Assets/LABColor.cs" />
         <option value="$PROJECT_DIR$/Assets/SandCellImplementation.cs" />
-        <option value="$PROJECT_DIR$/Assets/WaterCellImplementation.cs" />
         <option value="$PROJECT_DIR$/Assets/ChunkHandler.cs" />
         <option value="$PROJECT_DIR$/Assets/MeshRendererDrawer.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/Editor/MeshRendererDrawer.cs" />
-        <option value="$PROJECT_DIR$/Assets/WorldGrid.cs" />
         <option value="$PROJECT_DIR$/Assets/ChunkBehaviour.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/Editor/MeshRendererInspector.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/Editor/awdhawi.cs" />
+        <option value="$PROJECT_DIR$/Assets/WaterCellImplementation.cs" />
+        <option value="$PROJECT_DIR$/Assets/Scripts/PlayerChunkLoader.cs" />
+        <option value="$PROJECT_DIR$/Assets/WorldGrid.cs" />
       </list>
     </option>
   </component>
@@ -131,7 +119,7 @@
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="settings.editor.selected.configurable" value="editor.preferences.smartKeys_rider" />
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Attach to Unity Editor.Attach to Unity Editor">
     <configuration name="Standalone Player" type="RunUnityExe" factoryName="Unity Executable">
       <option name="EXE_PATH" value="$PROJECT_DIR$/../../Temp/Builds/Pixel test\Pixel test.exe" />
       <option name="PROGRAM_PARAMETERS" value="" />
@@ -183,6 +171,10 @@
       <workItem from="1605400650702" duration="403000" />
       <workItem from="1605411390408" duration="62000" />
       <workItem from="1605411466682" duration="3347000" />
+      <workItem from="1605457682323" duration="7000" />
+      <workItem from="1605457720273" duration="155000" />
+      <workItem from="1605457886093" duration="66000" />
+      <workItem from="1605457971752" duration="2432000" />
     </task>
     <task id="LOCAL−00001" summary="aaaaaa">
       <created>1603464344920</created>
@@ -244,6 +236,10 @@
     <option name="LAST_COMMIT_MESSAGE" value="a" />
   </component>
   <component name="WindowStateProjectService">
+    <state x="552" y="160" key="#Plugins" timestamp="1605457950648">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="552" y="160" key="#Plugins/0.0.1920.1040@0.0.1920.1040" timestamp="1605457950648" />
     <state width="587" height="464" key="DebuggerActiveHint" timestamp="1603460243999">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -320,6 +316,10 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="832" y="236" key="RiderGenerateDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1603479089294" />
+    <state x="729" y="230" key="RollbackChangesDialog" timestamp="1605456958760">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="729" y="230" key="RollbackChangesDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1605456958760" />
     <state x="405" y="124" key="SettingsEditor" timestamp="1605386815555">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -336,6 +336,10 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="92" y="92" width="1736" height="856" key="com.intellij.history.integration.ui.views.FileHistoryDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1605389972642" />
+    <state x="749" y="254" key="com.intellij.openapi.vcs.changes.SpecificFilesViewDialog" timestamp="1605456764997">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="749" y="254" key="com.intellij.openapi.vcs.changes.SpecificFilesViewDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1605456764997" />
     <state x="638" y="253" width="798" height="534" key="find.popup" timestamp="1605387289563">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
