@@ -58,6 +58,8 @@ public static class CellUtils
         
         var oldCellChunk = chunkWithNeighbors.Value;
         var newCellChunk = chunkWithNeighbors.ChunkFromPosition(newChunkPosition);
+
+        if (newCellChunk.IsOutOfBounds) return false;
     
         var oldCell = oldCellChunk.GetCell(oldCellPosition);
         var newCell = newCellChunk.GetCell(newCellPosition);
@@ -140,6 +142,8 @@ public static class CellUtils
                 var oldCellChunk = chunkWithNeighbors.Value;
                 var newCellChunk = chunkWithNeighbors.ChunkFromPosition(newChunkPosition);
 
+                if (newCellChunk.IsOutOfBounds) return false;
+                
                 var oldCell = oldCellChunk.GetCell(oldCellPosition);
                 var newCell = newCellChunk.GetCell(newCellPosition);
 

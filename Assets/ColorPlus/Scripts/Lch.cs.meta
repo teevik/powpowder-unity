@@ -1,0 +1,37 @@
+fileFormatVersion: 2
+guid: f612ede77312e3e4bbbc170e0d08b188
+labels:
+- CIELAB
+- CIELCH
+- Color
+- Conversion
+- Difference
+- Effect
+- Gradient
+- Interpolation
+- Lab
+- Lch
+- Lerping
+- Nexgea
+- Plus
+- color
+- conversion
+- difference
+- gradient
+- interpolation
+- lab
+- lch
+- lerping
+- nexgea
+- plus
+timeCreated: 1525080596
+licenseType: Store
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

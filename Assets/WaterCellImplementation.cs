@@ -4,6 +4,20 @@ using int2 = Unity.Mathematics.int2;
 
 public struct WaterCellImplementation : ICellImplementation
 {
+    private readonly static Lch WaterStartColor = new Lch(65f, 37f, 249f);
+    private readonly static Lch WaterEndColor = new Lch(70f, 37f, 249f);
+
+    public static Cell CreateWaterCell(ref Random random)
+    {
+        var color = ColorPlus.LerpInLch(WaterStartColor, WaterEndColor, random.NextFloat());
+        
+        return new Cell
+        {
+            type = CellType.Water,
+            color = color,
+        };
+    }
+    
     public bool Update(ValueWithNeighbors<Chunk> chunkWithNeighbors, int2 cellPosition, Random random)
     {
         Cell? GetCellAtOffset(int2 offset)

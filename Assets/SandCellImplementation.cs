@@ -1,9 +1,25 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Unity.Mathematics;
 using static Unity.Mathematics.math;
+using Random = Unity.Mathematics.Random;
 
 public struct SandCellImplementation : ICellImplementation
 {
+    private readonly static Lch SandStartColor = new Lch(78f, 25f, 92f);
+    private readonly static Lch SandEndColor = new Lch(83f, 25f, 92f);
+
+    public static Cell CreateSandCell(ref Random random)
+    {
+        var color = ColorPlus.LerpInLch(SandStartColor, SandEndColor, random.NextFloat());
+        
+        return new Cell
+        {
+            type = CellType.Sand,
+            color = color,
+        };
+    }
+    
     private static readonly HashSet<CellType> AllowedCellTypes = new HashSet<CellType>
     {
         CellType.None,

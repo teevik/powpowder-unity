@@ -59,7 +59,7 @@ public struct ValueWithNeighbors<T>
 public class ChunkContainer
 {
     public Chunk Chunk;
-    public MeshRenderer Renderer;
+    public ChunkBehaviour ChunkBehaviour;
     public ComputeBuffer CellsComputeBuffer;
     public RenderTexture OutputRenderTexture;
 }
@@ -70,13 +70,14 @@ public class WorldGrid : MonoBehaviour
     
     [SerializeField] private ComputeShader computeShader;
     [SerializeField] private float simulationStep;
-    [SerializeField] private MeshRenderer chunkPrefab;
+    [SerializeField] private ChunkBehaviour chunkPrefab;
     [SerializeField] private float pixelsPerUnit;
     [SerializeField] private Vector2Int chunkAmountRadius = Vector2Int.one;
 
     private readonly Dictionary<int2, ChunkContainer> chunkContainers = new Dictionary<int2, ChunkContainer>();
     private int renderChunkKernelIndex;
     private ComputeBuffer cellTypeColorBuffer;
+    private Unity.Mathematics.Random random;
     
     private float ChunkScale => ChunkSize / pixelsPerUnit;
 
@@ -85,6 +86,8 @@ public class WorldGrid : MonoBehaviour
 
     private void Start()
     {
+        random = new Unity.Mathematics.Random((uint) new System.Random().Next());
+
         renderChunkKernelIndex = computeShader.FindKernel("render_chunk");
 
         cellTypeColorBuffer = new ComputeBuffer(4, SizeOfColor);
@@ -118,25 +121,20 @@ public class WorldGrid : MonoBehaviour
                 var chunk = new Chunk(Allocator.Persistent);
 
                 var cellsComputeBuffer = new ComputeBuffer(chunk.Cells.Length, SizeOfCell);
-                chunkRenderer.material.mainTexture = outputRenderTexture;
+                chunkRenderer.SetTexture(outputRenderTexture);
                 
-
                 for (var cellX = 0; cellX < ChunkSize; cellX++)
                 {
                     for (var cellY = 0; cellY < ChunkSize; cellY++)
                     {
-                        chunk.SetCell(int2(cellX, cellY), (Random.value > 0.5f) ? Cell.EmptyCell : new Cell
-                        {
-                            type = CellType.Sand,
-                            color = Color.yellow
-                        });
+                        chunk.SetCell(int2(cellX, cellY), (Random.value > 0.5f) ? Cell.EmptyCell : SandCellImplementation.CreateSandCell(ref random));
                     }
                 }
 
                 var chunkContainer = new ChunkContainer
                 {
                     Chunk = chunk,
-                    Renderer = chunkRenderer,
+                    ChunkBehaviour = chunkRenderer,
                     CellsComputeBuffer = cellsComputeBuffer,
                     OutputRenderTexture = outputRenderTexture
                 };
@@ -181,10 +179,7 @@ public class WorldGrid : MonoBehaviour
 
                     if (chunkContainers.TryGetValue(chunkPosition, out var chunkContainer))
                     {
-                        chunkContainer.Chunk.SetCell(cellPosition, new Cell
-                        {
-                            type = CellType.Water
-                        });
+                        chunkContainer.Chunk.SetCell(cellPosition, WaterCellImplementation.CreateWaterCell(ref random));
                     }
                 }
             }
@@ -202,6 +197,8 @@ public class WorldGrid : MonoBehaviour
             {
                 var chunkPosition = int2(x, y);
                 var chunkContainer = chunkContainers[chunkPosition];
+                
+                if (chunkContainer == null) continue;
 
                 chunkContainer.CellsComputeBuffer.SetData(chunkContainer.Chunk.Cells);
 
@@ -222,9 +219,10 @@ public class WorldGrid : MonoBehaviour
         private Unity.Mathematics.Random random;
         private CommandBuilder drawingCommands;
         private float2 chunkPosition;
-        private float chunkScale;
+        private readonly float chunkScale;
+        private readonly float simulationStep;
         
-        public UpdateChunkJob(ValueWithNeighbors<Chunk> chunkWithNeighbors, uint frameCount, Unity.Mathematics.Random random, CommandBuilder drawingCommands, float2 chunkPosition, float chunkScale)
+        public UpdateChunkJob(ValueWithNeighbors<Chunk> chunkWithNeighbors, uint frameCount, Unity.Mathematics.Random random, CommandBuilder drawingCommands, float2 chunkPosition, float chunkScale, float simulationStep)
         {
             this.chunkWithNeighbors = chunkWithNeighbors;
             this.frameCount = frameCount;
@@ -232,6 +230,7 @@ public class WorldGrid : MonoBehaviour
             this.drawingCommands = drawingCommands;
             this.chunkPosition = chunkPosition;
             this.chunkScale = chunkScale;
+            this.simulationStep = simulationStep;
         }
 
         public void Execute()
@@ -244,163 +243,166 @@ public class WorldGrid : MonoBehaviour
             // var shouldGoReverse = random.NextBool();
             // var shouldGoReverse2 = random.NextBool();
 
-            var hasDirtyRect = false;
-            int? minCellPositionX = null;
-            int? minCellPositionY = null;
-            int? maxCellPositionX = null;
-            int? maxCellPositionY = null;
+            // var hasDirtyRect = false;
+            // int? minCellPositionX = null;
+            // int? minCellPositionY = null;
+            // int? maxCellPositionX = null;
+            // int? maxCellPositionY = null;
+            //
+            // void CheckForDirtyRect(Cell cell, int2 cellPosition)
+            // {
+            //     if (cell.isStale) return;
+            //     
+            //     hasDirtyRect = true;
+            //
+            //     if (!minCellPositionX.HasValue || cellPosition.x < minCellPositionX.Value)
+            //     {
+            //         minCellPositionX = cellPosition.x;
+            //     }
+            //         
+            //     if (!minCellPositionY.HasValue || cellPosition.y < minCellPositionY.Value)
+            //     {
+            //         minCellPositionY = cellPosition.y;
+            //     }
+            //         
+            //     if (!maxCellPositionX.HasValue || cellPosition.x > maxCellPositionX.Value)
+            //     {
+            //         maxCellPositionX = cellPosition.x;
+            //     }
+            //         
+            //     if (!maxCellPositionY.HasValue || cellPosition.y < maxCellPositionY.Value)
+            //     {
+            //         maxCellPositionY = cellPosition.y;
+            //     }
+            // }
+            //
+            // for (var chunkX = -1; chunkX < 2; chunkX++)
+            // {
+            //     for (var chunkY = -1; chunkY < 2; chunkY++)
+            //     {
+            //         if (chunkX == 0 && chunkY == 0) continue;
+            //         
+            //         var chunkPosition = int2(chunkX, chunkY);
+            //         var chunk = chunkWithNeighbors.ChunkFromPosition(chunkPosition);
+            //         
+            //         if (chunk.IsOutOfBounds) continue;
+            //
+            //         if (chunkX == 1 && chunkY == 1)
+            //         {
+            //             var cell = chunk.GetCell(int2(0, 0));
+            //             CheckForDirtyRect(cell , int2(0, 0));
+            //         }
+            //         else if (chunkX == 1 && chunkY == -1)
+            //         {
+            //             var cell = chunk.GetCell(int2(0, ChunkSize - 1));
+            //             CheckForDirtyRect(cell , int2(0, ChunkSize - 1));
+            //         }
+            //         else if (chunkX == -1 && chunkY == 1)
+            //         {
+            //             var cell = chunk.GetCell(int2(ChunkSize - 1, 0));
+            //             CheckForDirtyRect(cell , int2(ChunkSize - 1, 0));
+            //         }
+            //         else if (chunkX == -1 && chunkY == -1)
+            //         {
+            //             var cell = chunk.GetCell(int2(ChunkSize - 1, ChunkSize - 1));
+            //             CheckForDirtyRect(cell , int2(ChunkSize - 1, ChunkSize - 1));
+            //         } 
+            //         else if (chunkY == -1)
+            //         {
+            //             for (var x = 0; x < ChunkSize; x++)
+            //             {
+            //                 var cell = chunk.GetCell(int2(x, ChunkSize - 1));
+            //                 CheckForDirtyRect(cell , int2(x, ChunkSize - 1));
+            //             }
+            //         }
+            //         else if (chunkY == 1)
+            //         {
+            //             for (var x = 0; x < ChunkSize; x++)
+            //             {
+            //                 var cell = chunk.GetCell(int2(x, 0));
+            //                 CheckForDirtyRect(cell , int2(x, 0));
+            //             }
+            //         }
+            //         else if (chunkX == -1)
+            //         {
+            //             for (var y = 0; y < ChunkSize; y++)
+            //             {
+            //                 var cell = chunk.GetCell(int2(ChunkSize - 1, y));
+            //                 CheckForDirtyRect(cell , int2(ChunkSize - 1, y));
+            //             }
+            //         }
+            //         else if (chunkX == 1)
+            //         {
+            //             for (var y = 0; y < ChunkSize; y++)
+            //             {
+            //                 var cell = chunk.GetCell(int2(0, y));
+            //                 CheckForDirtyRect(cell , int2(0, y));
+            //             }
+            //         }
+            //     }
+            // }
 
-            void CheckForDirtyRect(Cell cell, int2 cellPosition)
-            {
-                if (cell.isStale) return;
-                
-                hasDirtyRect = true;
+            // for (var x = 0; x < ChunkSize; x++)
+            // {
+            //     for (var y = 0; y < ChunkSize; y++)
+            //     {
+            //         var cellPosition = new int2(x, y);
+            //         var cell = chunkWithNeighbors.Value.GetCell(cellPosition);
+            //         
+            //         if (cell.isStale) continue;
+            //         hasDirtyRect = true;
+            //
+            //         if (!minCellPositionX.HasValue || cellPosition.x < minCellPositionX.Value)
+            //         {
+            //             minCellPositionX = cellPosition.x;
+            //         }
+            //         
+            //         if (!minCellPositionY.HasValue || cellPosition.y < minCellPositionY.Value)
+            //         {
+            //             minCellPositionY = cellPosition.y;
+            //         }
+            //         
+            //         if (!maxCellPositionX.HasValue || cellPosition.x > maxCellPositionX.Value)
+            //         {
+            //             maxCellPositionX = cellPosition.x;
+            //         }
+            //         
+            //         if (!maxCellPositionY.HasValue || cellPosition.y > maxCellPositionY.Value)
+            //         {
+            //             maxCellPositionY = cellPosition.y;
+            //         }
+            //     }
+            // }
+            //
+            //
+            // if (!hasDirtyRect) return;
 
-                if (!minCellPositionX.HasValue || cellPosition.x < minCellPositionX.Value)
-                {
-                    minCellPositionX = cellPosition.x;
-                }
-                    
-                if (!minCellPositionY.HasValue || cellPosition.y < minCellPositionY.Value)
-                {
-                    minCellPositionY = cellPosition.y;
-                }
-                    
-                if (!maxCellPositionX.HasValue || cellPosition.x > maxCellPositionX.Value)
-                {
-                    maxCellPositionX = cellPosition.x;
-                }
-                    
-                if (!maxCellPositionY.HasValue || cellPosition.y < maxCellPositionY.Value)
-                {
-                    maxCellPositionY = cellPosition.y;
-                }
-            }
+            // var minCellPosition = max(int2(minCellPositionX.Value, minCellPositionY.Value) - int2(1), int2(0));
+            // var maxCellPosition = min(int2(maxCellPositionX.Value, maxCellPositionY.Value) + int2(1), int2(ChunkSize));
 
-            for (var chunkX = -1; chunkX < 2; chunkX++)
-            {
-                for (var chunkY = -1; chunkY < 2; chunkY++)
-                {
-                    if (chunkX == 0 && chunkY == 0) continue;
-                    
-                    var chunkPosition = int2(chunkX, chunkY);
-                    var chunk = chunkWithNeighbors.ChunkFromPosition(chunkPosition);
-                    
-                    if (chunk.IsOutOfBounds) continue;
+            // var minCellPercentage = ((float2) minCellPosition) / (float)ChunkSize;
+            // var maxCellPercentage = ((float2) maxCellPosition) / (float)ChunkSize;
 
-                    if (chunkX == 1 && chunkY == 1)
-                    {
-                        var cell = chunk.GetCell(int2(0, 0));
-                        CheckForDirtyRect(cell , int2(0, 0));
-                    }
-                    else if (chunkX == 1 && chunkY == -1)
-                    {
-                        var cell = chunk.GetCell(int2(0, ChunkSize - 1));
-                        CheckForDirtyRect(cell , int2(0, ChunkSize - 1));
-                    }
-                    else if (chunkX == -1 && chunkY == 1)
-                    {
-                        var cell = chunk.GetCell(int2(ChunkSize - 1, 0));
-                        CheckForDirtyRect(cell , int2(ChunkSize - 1, 0));
-                    }
-                    else if (chunkX == -1 && chunkY == -1)
-                    {
-                        var cell = chunk.GetCell(int2(ChunkSize - 1, ChunkSize - 1));
-                        CheckForDirtyRect(cell , int2(ChunkSize - 1, ChunkSize - 1));
-                    } 
-                    else if (chunkY == -1)
-                    {
-                        for (var x = 0; x < ChunkSize; x++)
-                        {
-                            var cell = chunk.GetCell(int2(x, ChunkSize - 1));
-                            CheckForDirtyRect(cell , int2(x, ChunkSize - 1));
-                        }
-                    }
-                    else if (chunkY == 1)
-                    {
-                        for (var x = 0; x < ChunkSize; x++)
-                        {
-                            var cell = chunk.GetCell(int2(x, 0));
-                            CheckForDirtyRect(cell , int2(x, 0));
-                        }
-                    }
-                    else if (chunkX == -1)
-                    {
-                        for (var y = 0; y < ChunkSize; y++)
-                        {
-                            var cell = chunk.GetCell(int2(ChunkSize - 1, y));
-                            CheckForDirtyRect(cell , int2(ChunkSize - 1, y));
-                        }
-                    }
-                    else if (chunkX == 1)
-                    {
-                        for (var y = 0; y < ChunkSize; y++)
-                        {
-                            var cell = chunk.GetCell(int2(0, y));
-                            CheckForDirtyRect(cell , int2(0, y));
-                        }
-                    }
-                }
-            }
-
-            for (var x = 0; x < ChunkSize; x++)
-            {
-                for (var y = 0; y < ChunkSize; y++)
-                {
-                    var cellPosition = new int2(x, y);
-                    var cell = chunkWithNeighbors.Value.GetCell(cellPosition);
-                    
-                    if (cell.isStale) continue;
-                    hasDirtyRect = true;
-
-                    if (!minCellPositionX.HasValue || cellPosition.x < minCellPositionX.Value)
-                    {
-                        minCellPositionX = cellPosition.x;
-                    }
-                    
-                    if (!minCellPositionY.HasValue || cellPosition.y < minCellPositionY.Value)
-                    {
-                        minCellPositionY = cellPosition.y;
-                    }
-                    
-                    if (!maxCellPositionX.HasValue || cellPosition.x > maxCellPositionX.Value)
-                    {
-                        maxCellPositionX = cellPosition.x;
-                    }
-                    
-                    if (!maxCellPositionY.HasValue || cellPosition.y > maxCellPositionY.Value)
-                    {
-                        maxCellPositionY = cellPosition.y;
-                    }
-                }
-            }
-
-
-            if (!hasDirtyRect) return;
-
-            var minCellPosition = max(int2(minCellPositionX.Value, minCellPositionY.Value) - int2(1), int2(0));
-            var maxCellPosition = min(int2(maxCellPositionX.Value, maxCellPositionY.Value) + int2(1), int2(ChunkSize));
-
-            var minCellPercentage = (float2)minCellPosition / ChunkSize;
-            var maxCellPercentage = (float2)maxCellPosition / ChunkSize;
-
-            if (chunkPosition.Equals(float2(0f)))
-            {
-                Debug.Log(minCellPosition);
-                Debug.Log(maxCellPosition);
-            }
             
-            var a = new Rect(
-                chunkPosition.x - (chunkScale / 2) + (chunkScale * minCellPercentage.x), 
-                chunkPosition.y - (chunkScale / 2) + (chunkScale * minCellPercentage.y), 
-                chunkScale - (chunkScale * maxCellPercentage.x) - (chunkScale * minCellPercentage.x), 
-                chunkScale - (chunkScale * maxCellPercentage.y) - (chunkScale * minCellPercentage.y)
-            );
+            var minCellPosition = int2(0);
+            var maxCellPosition = int2(ChunkSize);
             
-            drawingCommands.WireRectangle(a, Color.red);
             
+            // var a = new Rect(
+            //     chunkPosition.x - (chunkScale / 2),// + (minCellPercentage.x * chunkScale), 
+            //     chunkPosition.y - (chunkScale / 2) + chunkScale - (minCellPercentage.x * chunkScale),// - (maxCellPercentage.y * chunkScale), 
+            //     chunkScale,// * maxCellPercentage.x,
+            //     chunkScale// * maxCellPercentage.y
+            // );
+            //
+            // drawingCommands.PushLineWidth(0.5f);
+            // drawingCommands.PushDuration(simulationStep * 50);
+            // drawingCommands.WireRectangle(a, Color.red);
+            // drawingCommands.PopLineWidth();
+            // drawingCommands.PopDuration();
+
             // for (var x = shouldGoReverse ? ChunkSize - 1 : 0; shouldGoReverse ? x >= 0 : x < ChunkSize; x += (shouldGoReverse ? -1 : 1))
-            for (var x = shouldGoReverse ? maxCellPosition.x - 1 : minCellPosition.x; shouldGoReverse ? x >= minCellPosition.x : x < maxCellPosition.x - 1; x += (shouldGoReverse ? -1 : 1))
+            for (var x = shouldGoReverse ? maxCellPosition.x - 1 : minCellPosition.x; shouldGoReverse ? x >= minCellPosition.x : x < maxCellPosition.x; x += (shouldGoReverse ? -1 : 1))
             {
                 // for (var y = 0; y < ChunkSize; y++)
                 for (var y = maxCellPosition.y - 1; y >= minCellPosition.y; y--)
@@ -418,20 +420,21 @@ public class WorldGrid : MonoBehaviour
                     
                     if (cell.type == CellType.Sand)
                     {
-                        cell.isStale = false;
-                        
+                        // cell.isStale = false;
+                        // chunkWithNeighbors.Value.SetCell(cellPosition, cell);
+
                         if (sandCellImplementation.Update(chunkWithNeighbors, cellPosition, random))
                         {
                         }
                         else
                         {
                             // cell.isStale = true;
-                            chunkWithNeighbors.Value.SetCell(cellPosition, cell);
+                            // chunkWithNeighbors.Value.SetCell(cellPosition, cell);
                         }
                     }
                     else if (cell.type == CellType.Water)
                     {
-                        cell.isStale = false;
+                        // cell.isStale = false;
 
                         if (waterCellImplementation.Update(chunkWithNeighbors, cellPosition, random))
                         {
@@ -439,7 +442,7 @@ public class WorldGrid : MonoBehaviour
                         else
                         {
                             // cell.isStale = true;
-                            chunkWithNeighbors.Value.SetCell(cellPosition, cell);
+                            // chunkWithNeighbors.Value.SetCell(cellPosition, cell);
                         }
                     }
                 }
@@ -450,94 +453,78 @@ public class WorldGrid : MonoBehaviour
     private readonly Chunk outOfBoundsChunk = Chunk.CreateOutOfBoundsChunk(Allocator.Persistent);
     
     private IEnumerator UpdateWorldCoroutine()
-     {
-         using var drawingCommands = DrawingManager.GetBuilder();
+    {
 
-         var random = new System.Random();
+        var random = new System.Random();
 
-         using (drawingCommands.InLocalSpace(transform))
-         {
-             while (true)
-             {
-                 var minChunkX = chunkContainers.Min(a => a.Key.x);
-                 var minChunkY = chunkContainers.Min(a => a.Key.y);
-                 var maxChunkX = chunkContainers.Max(a => a.Key.x);
-                 var maxChunkY = chunkContainers.Max(a => a.Key.y);
+        while (true)
+        {
+            using var drawingCommands = DrawingManager.GetBuilder();
 
+            var minChunkX = chunkContainers.Min(a => a.Key.x);
+            var minChunkY = chunkContainers.Min(a => a.Key.y);
+            var maxChunkX = chunkContainers.Max(a => a.Key.x);
+            var maxChunkY = chunkContainers.Max(a => a.Key.y);
 
-                 for (int i = 0; i < 2; i++)
-                 {
-                     for (int j = 0; j < 2; j++)
-                     {
-                         JobHandle? jobHandle = null;
-                         
-                         for (var chunkX = minChunkX; chunkX <= maxChunkX; chunkX++)
-                         {
-                             for (var chunkY = minChunkY; chunkY <= maxChunkY; chunkY++)
-                             {
-                                 if (((chunkX % 2) == i) && ((chunkY % 2) == j)) continue;
+            for (int i = 0; i < 2; i++)
+            {
+                for (int j = 0; j < 2; j++)
+                {
+                    JobHandle? jobHandle = null;
 
-                                 var chunkPosition = int2(chunkX, chunkY);
-                                 var chunkContainer = chunkContainers[chunkPosition];
+                    for (var chunkX = minChunkX; chunkX <= maxChunkX; chunkX++)
+                    {
+                        for (var chunkY = minChunkY; chunkY <= maxChunkY; chunkY++)
+                        {
+                            if (!((abs(chunkX % 2) == i) || (abs(chunkY % 2) == j))) continue;
 
-                                 var chunkContainersWithNeighbors = new ValueWithNeighbors<ChunkContainer?>
-                                 {
-                                     Value = chunkContainer,
-                                     North = chunkContainers.TryGetValue(chunkPosition + int2(0, 1)),
-                                     NorthEast = chunkContainers.TryGetValue(chunkPosition + int2(1, 1)),
-                                     East = chunkContainers.TryGetValue(chunkPosition + int2(1, 0)),
-                                     SouthEast = chunkContainers.TryGetValue(chunkPosition + int2(1, -1)),
-                                     South = chunkContainers.TryGetValue(chunkPosition + int2(0, -1)),
-                                     SouthWest = chunkContainers.TryGetValue(chunkPosition + int2(-1, -1)),
-                                     West = chunkContainers.TryGetValue(chunkPosition + int2(-1, 0)),
-                                     NorthWest = chunkContainers.TryGetValue(chunkPosition + int2(-1, 1)),
-                                 };
-                                 
-                                 var a = new ValueWithNeighbors<Chunk?>
-                                 {
-                                     Value = null,
-                                     North = 
-                                 };
+                            var chunkPosition = int2(chunkX, chunkY);
+                            var chunkContainer = chunkContainers[chunkPosition];
 
-                                 var chunkWithNeighbors = new ValueWithNeighbors<Chunk>
-                                 {
-                                     Value = chunkContainer.Chunk,
-                                     North = chunkContainersWithNeighbors.North?.Chunk ??
-                                             Chunk.CreateOutOfBoundsChunk(Allocator.TempJob),
-                                     NorthEast = chunkContainersWithNeighbors.NorthEast?.Chunk ??
-                                                 Chunk.CreateOutOfBoundsChunk(Allocator.TempJob),
-                                     East = chunkContainersWithNeighbors.East?.Chunk ??
-                                            Chunk.CreateOutOfBoundsChunk(Allocator.TempJob),
-                                     SouthEast = chunkContainersWithNeighbors.SouthEast?.Chunk ??
-                                                 Chunk.CreateOutOfBoundsChunk(Allocator.TempJob),
-                                     South = chunkContainersWithNeighbors.South?.Chunk ??
-                                             Chunk.CreateOutOfBoundsChunk(Allocator.TempJob),
-                                     SouthWest = chunkContainersWithNeighbors.SouthWest?.Chunk ??
-                                                 Chunk.CreateOutOfBoundsChunk(Allocator.TempJob),
-                                     West = chunkContainersWithNeighbors.West?.Chunk ??
-                                            Chunk.CreateOutOfBoundsChunk(Allocator.TempJob),
-                                     NorthWest = chunkContainersWithNeighbors.NorthWest?.Chunk ??
-                                                 Chunk.CreateOutOfBoundsChunk(Allocator.TempJob)
-                                 };
-                                 
-                                 var job = new UpdateChunkJob(chunkWithNeighbors, (uint) Time.frameCount,
-                                     new Unity.Mathematics.Random((uint) random.Next()), drawingCommands,
-                                     (float2) chunkPosition * ChunkScale, ChunkScale);
-                                 var newJobHandle = job.Schedule();
+                            if (chunkContainer == null) continue;
 
-                                 if (jobHandle == null) jobHandle = newJobHandle;
-                                 else jobHandle = JobHandle.CombineDependencies(jobHandle.Value, newJobHandle);
-                             }
-                         }
+                            var chunkContainersWithNeighbors = new ValueWithNeighbors<ChunkContainer?>
+                            {
+                                Value = chunkContainer,
+                                North = chunkContainers.TryGetValue(chunkPosition + int2(0, 1)),
+                                NorthEast = chunkContainers.TryGetValue(chunkPosition + int2(1, 1)),
+                                East = chunkContainers.TryGetValue(chunkPosition + int2(1, 0)),
+                                SouthEast = chunkContainers.TryGetValue(chunkPosition + int2(1, -1)),
+                                South = chunkContainers.TryGetValue(chunkPosition + int2(0, -1)),
+                                SouthWest = chunkContainers.TryGetValue(chunkPosition + int2(-1, -1)),
+                                West = chunkContainers.TryGetValue(chunkPosition + int2(-1, 0)),
+                                NorthWest = chunkContainers.TryGetValue(chunkPosition + int2(-1, 1)),
+                            };
 
-                         if (jobHandle != null) jobHandle.Value.Complete();
+                            var chunkWithNeighbors = new ValueWithNeighbors<Chunk>
+                            {
+                                Value = chunkContainer.Chunk,
+                                North = chunkContainersWithNeighbors.North?.Chunk ?? outOfBoundsChunk,
+                                NorthEast = chunkContainersWithNeighbors.NorthEast?.Chunk ?? outOfBoundsChunk,
+                                East = chunkContainersWithNeighbors.East?.Chunk ?? outOfBoundsChunk,
+                                SouthEast = chunkContainersWithNeighbors.SouthEast?.Chunk ?? outOfBoundsChunk,
+                                South = chunkContainersWithNeighbors.South?.Chunk ?? outOfBoundsChunk,
+                                SouthWest = chunkContainersWithNeighbors.SouthWest?.Chunk ?? outOfBoundsChunk,
+                                West = chunkContainersWithNeighbors.West?.Chunk ?? outOfBoundsChunk,
+                                NorthWest = chunkContainersWithNeighbors.NorthWest?.Chunk ?? outOfBoundsChunk
+                            };
 
-                         yield return new WaitForSeconds(simulationStep);
-                     }
-                 }
-             }
-         }
-     }
+                            var job = new UpdateChunkJob(chunkWithNeighbors, (uint) Time.frameCount,
+                                new Unity.Mathematics.Random((uint) random.Next()), drawingCommands,
+                                (float2) chunkPosition * ChunkScale, ChunkScale, simulationStep);
+                            var newJobHandle = job.Schedule();
+
+                            if (jobHandle == null) jobHandle = newJobHandle;
+                            else jobHandle = JobHandle.CombineDependencies(jobHandle.Value, newJobHandle);
+                        }
+                    }
+
+                    if (jobHandle != null) jobHandle.Value.Complete();
+                }
+            }
+            yield return new WaitForSeconds(simulationStep);
+        }
+    }
 
     private void OnDrawGizmos()
     {
