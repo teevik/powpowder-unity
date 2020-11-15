@@ -271,6 +271,7 @@ MonoBehaviour:
   simulationStep: 0.001
   chunkPrefab: {fileID: 6476554797960812486, guid: 0facde947bd8c06418aaad7ea44d3270, type: 3}
   pixelsPerUnit: 7
+  maxChunksLoaded: 95
 --- !u!4 &703278566
 Transform:
   m_ObjectHideFlags: 0

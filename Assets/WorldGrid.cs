@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using Drawing;
 using Extensions;
@@ -66,6 +65,7 @@ public class ChunkContainer : IDisposable
     {
         Chunk.Dispose();
         CellsComputeBuffer.Dispose();
+        GameObject.Destroy(ChunkBehaviour.gameObject);
     }
 }
 
@@ -79,8 +79,7 @@ public class WorldGrid : MonoBehaviour
     [SerializeField] private float pixelsPerUnit;
     [SerializeField] private int maxChunksLoaded = 60;
     
-    private readonly Dictionary<int2, ChunkContainer> chunkContainers = new Dictionary<int2, ChunkContainer>();
-    private Queue<ChunkContainer> loadedChunks = new Queue<ChunkContainer>();
+    private readonly QueueDictionary<int2, ChunkContainer> loadedChunks = new QueueDictionary<int2, ChunkContainer>();
     private int renderChunkKernelIndex;
     private ComputeBuffer cellTypeColorBuffer;
     private Unity.Mathematics.Random random;
@@ -92,7 +91,7 @@ public class WorldGrid : MonoBehaviour
 
     public bool ChunkIsLoaded(int2 chunkPosition)
     {
-        return chunkContainers.ContainsKey(chunkPosition);
+        return loadedChunks.ContainsKey(chunkPosition);
     }
     
     public void LoadChunk(int2 chunkPosition)
@@ -144,8 +143,7 @@ public class WorldGrid : MonoBehaviour
             OutputRenderTexture = outputRenderTexture
         };
         
-        chunkContainers.Add(chunkPosition, chunkContainer);
-        loadedChunks.Enqueue(chunkContainer);
+        loadedChunks.Enqueue(chunkPosition, chunkContainer);
     }
 
     private void Awake()
@@ -176,7 +174,7 @@ public class WorldGrid : MonoBehaviour
     {
         cellTypeColorBuffer.Dispose();
         
-        foreach (var chunkContainerPair in chunkContainers)
+        foreach (var chunkContainerPair in loadedChunks)
         {
             var chunkContainer = chunkContainerPair.Value;
             
@@ -197,7 +195,7 @@ public class WorldGrid : MonoBehaviour
 
     private void Update()
     {
-        if (chunkContainers.Count == 0) return;
+        if (loadedChunks.Count == 0) return;
         
         if (Input.GetMouseButton(0))
         {
@@ -215,7 +213,7 @@ public class WorldGrid : MonoBehaviour
                     var chunkPosition = int2(floor(offsetedCursorPosition / (float2) ChunkSize));
                     var cellPosition = offsetedCursorPosition - (chunkPosition * ChunkSize);
 
-                    if (chunkContainers.TryGetValue(chunkPosition, out var chunkContainer))
+                    if (loadedChunks.TryGetValue(chunkPosition, out var chunkContainer))
                     {
                         chunkContainer.Chunk.SetCell(cellPosition, WaterCellImplementation.CreateWaterCell(ref random));
                     }
@@ -223,10 +221,10 @@ public class WorldGrid : MonoBehaviour
             }
         }
         
-        var minX = chunkContainers.Min(a => a.Key.x);
-        var minY = chunkContainers.Min(a => a.Key.y);
-        var maxX = chunkContainers.Max(a => a.Key.x);
-        var maxY = chunkContainers.Max(a => a.Key.y);
+        var minX = loadedChunks.Min(a => a.Key.x);
+        var minY = loadedChunks.Min(a => a.Key.y);
+        var maxX = loadedChunks.Max(a => a.Key.x);
+        var maxY = loadedChunks.Max(a => a.Key.y);
 
         
         for (var x = minX; x <= maxX; x++)
@@ -234,7 +232,7 @@ public class WorldGrid : MonoBehaviour
             for (var y = minY; y <= maxY; y++)
             {
                 var chunkPosition = int2(x, y);
-                if (!chunkContainers.TryGetValue(chunkPosition, out var chunkContainer)) continue;
+                if (!loadedChunks.TryGetValue(chunkPosition, out var chunkContainer)) continue;
 
                 chunkContainer.CellsComputeBuffer.SetData(chunkContainer.Chunk.Cells);
 
@@ -508,12 +506,18 @@ public class WorldGrid : MonoBehaviour
 
         while (true)
         {
+            if (loadedChunks.Count == 0)
+            {
+                yield return new WaitForSeconds(simulationStep);
+                continue;
+            }
+            
             using var drawingCommands = DrawingManager.GetBuilder();
 
-            var minChunkX = chunkContainers.Min(a => a.Key.x);
-            var minChunkY = chunkContainers.Min(a => a.Key.y);
-            var maxChunkX = chunkContainers.Max(a => a.Key.x);
-            var maxChunkY = chunkContainers.Max(a => a.Key.y);
+            var minChunkX = loadedChunks.Min(a => a.Key.x);
+            var minChunkY = loadedChunks.Min(a => a.Key.y);
+            var maxChunkX = loadedChunks.Max(a => a.Key.x);
+            var maxChunkY = loadedChunks.Max(a => a.Key.y);
 
             for (int i = 0; i < 2; i++)
             {
@@ -528,19 +532,19 @@ public class WorldGrid : MonoBehaviour
                             if (!((abs(chunkX % 2) == i) || (abs(chunkY % 2) == j))) continue;
 
                             var chunkPosition = int2(chunkX, chunkY);
-                            if (!chunkContainers.TryGetValue(chunkPosition, out var chunkContainer)) continue;
+                            if (!loadedChunks.TryGetValue(chunkPosition, out var chunkContainer)) continue;
                             
                             var chunkContainersWithNeighbors = new ValueWithNeighbors<ChunkContainer?>
                             {
                                 Value = chunkContainer,
-                                North = chunkContainers.TryGetValue(chunkPosition + int2(0, 1)),
-                                NorthEast = chunkContainers.TryGetValue(chunkPosition + int2(1, 1)),
-                                East = chunkContainers.TryGetValue(chunkPosition + int2(1, 0)),
-                                SouthEast = chunkContainers.TryGetValue(chunkPosition + int2(1, -1)),
-                                South = chunkContainers.TryGetValue(chunkPosition + int2(0, -1)),
-                                SouthWest = chunkContainers.TryGetValue(chunkPosition + int2(-1, -1)),
-                                West = chunkContainers.TryGetValue(chunkPosition + int2(-1, 0)),
-                                NorthWest = chunkContainers.TryGetValue(chunkPosition + int2(-1, 1)),
+                                North = loadedChunks.TryGetValue(chunkPosition + int2(0, 1)),
+                                NorthEast = loadedChunks.TryGetValue(chunkPosition + int2(1, 1)),
+                                East = loadedChunks.TryGetValue(chunkPosition + int2(1, 0)),
+                                SouthEast = loadedChunks.TryGetValue(chunkPosition + int2(1, -1)),
+                                South = loadedChunks.TryGetValue(chunkPosition + int2(0, -1)),
+                                SouthWest = loadedChunks.TryGetValue(chunkPosition + int2(-1, -1)),
+                                West = loadedChunks.TryGetValue(chunkPosition + int2(-1, 0)),
+                                NorthWest = loadedChunks.TryGetValue(chunkPosition + int2(-1, 1)),
                             };
 
                             var chunkWithNeighbors = new ValueWithNeighbors<Chunk>
@@ -575,9 +579,9 @@ public class WorldGrid : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        if (chunkContainers.Count > 0)
+        if (loadedChunks.Count > 0)
         {
-            foreach (var chunkContainer in chunkContainers)
+            foreach (var chunkContainer in loadedChunks)
             {
                 Gizmos.DrawWireCube(chunkContainer.Value.ChunkBehaviour.transform.position, new Vector3(ChunkScale, ChunkScale));
             }

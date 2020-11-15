@@ -153,7 +153,7 @@
             <e p="MeshRendererInspector.cs" t="Include" />
           </e>
           <e p="Extensions" t="Include">
-            <e p="DictionaryExtensions.cs" t="Include" />
+            <e p="ReadonlyDictionaryExtensions.cs" t="Include" />
           </e>
           <e p="PlayerChunkLoader.cs" t="Include" />
         </e>
