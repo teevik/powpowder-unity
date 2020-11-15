@@ -144,6 +144,7 @@
             </e>
           </e>
         </e>
+        <e p="QueueDictionary.cs" t="Include" />
         <e p="RenderChunk.compute" t="Include" />
         <e p="SandCellImplementation.cs" t="Include" />
         <e p="Scripts" t="Include">

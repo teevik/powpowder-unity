@@ -55,12 +55,18 @@ public struct ValueWithNeighbors<T>
     }
 }
 
-public class ChunkContainer
+public class ChunkContainer : IDisposable
 {
     public Chunk Chunk;
     public ChunkBehaviour ChunkBehaviour;
     public ComputeBuffer CellsComputeBuffer;
     public RenderTexture OutputRenderTexture;
+
+    public void Dispose()
+    {
+        Chunk.Dispose();
+        CellsComputeBuffer.Dispose();
+    }
 }
 
 public class WorldGrid : MonoBehaviour
@@ -71,8 +77,10 @@ public class WorldGrid : MonoBehaviour
     [SerializeField] private float simulationStep;
     [SerializeField] private ChunkBehaviour chunkPrefab;
     [SerializeField] private float pixelsPerUnit;
-
+    [SerializeField] private int maxChunksLoaded = 60;
+    
     private readonly Dictionary<int2, ChunkContainer> chunkContainers = new Dictionary<int2, ChunkContainer>();
+    private Queue<ChunkContainer> loadedChunks = new Queue<ChunkContainer>();
     private int renderChunkKernelIndex;
     private ComputeBuffer cellTypeColorBuffer;
     private Unity.Mathematics.Random random;
@@ -137,6 +145,7 @@ public class WorldGrid : MonoBehaviour
         };
         
         chunkContainers.Add(chunkPosition, chunkContainer);
+        loadedChunks.Enqueue(chunkContainer);
     }
 
     private void Awake()
@@ -160,6 +169,7 @@ public class WorldGrid : MonoBehaviour
         computeShader.SetBuffer(renderChunkKernelIndex, "cell_type_colors", cellTypeColorBuffer);
         
         StartCoroutine(UpdateWorldCoroutine());
+        StartCoroutine(UnloadOldChunksCoroutine());
     }
 
     private void OnDestroy()
@@ -170,8 +180,7 @@ public class WorldGrid : MonoBehaviour
         {
             var chunkContainer = chunkContainerPair.Value;
             
-            chunkContainer.Chunk.Dispose();
-            chunkContainer.CellsComputeBuffer.Dispose();
+            chunkContainer.Dispose();
         }
     }
 
@@ -478,6 +487,19 @@ public class WorldGrid : MonoBehaviour
     }
     
     private readonly Chunk outOfBoundsChunk = Chunk.CreateOutOfBoundsChunk(Allocator.Persistent);
+
+    private IEnumerator UnloadOldChunksCoroutine()
+    {
+        while (true)
+        {
+            while (loadedChunks.Count > maxChunksLoaded)
+            {
+                loadedChunks.Dequeue().Dispose();
+            }
+            
+            yield return new WaitForSeconds(0.1f);
+        }
+    }
     
     private IEnumerator UpdateWorldCoroutine()
     {

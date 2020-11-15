@@ -23,11 +23,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="11ae6f55-283d-488c-a89b-fbda3698cb4a" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/PlayerChunkLoader.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/QueueDictionary.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/QueueDictionary.cs.meta" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.pixel-test/.idea/contentModel.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.pixel-test/.idea/contentModel.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.pixel-test/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.pixel-test/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scenes/SampleScene.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/SampleScene.unity" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/WaterCellImplementation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/WaterCellImplementation.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/WorldGrid.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/WorldGrid.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -40,11 +39,14 @@
   </component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/7C72A31C-6717-401A-8F3A-6328E904D4C3/1e/00bf45ca/Object.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/CACD6C6A-C61D-45CD-B58B-92E86EE53F52/b1/72a77789/IReadOnlyDictionary`2.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.mathematics@1.2.1/Unity.Mathematics/float2.gen.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/7C72A31C-6717-401A-8F3A-6328E904D4C3/c6/f261d6d8/Renderer.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/CACD6C6A-C61D-45CD-B58B-92E86EE53F52/fa/eceb0a2e/Dictionary`2.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/CACD6C6A-C61D-45CD-B58B-92E86EE53F52/7c/9c0ff672/IDictionary.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/8AC5A40A-F873-4419-A25A-1FC9F71C1523/04/a3a3a16c/HashSet`1.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/7C72A31C-6717-401A-8F3A-6328E904D4C3/98/8a11d888/IJobExtensions.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/86B863EB-C99F-4AD0-A622-287D17075BA7/03/fa0afe44/Enumerable.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/195A4423-5CE0-457D-9B70-8E6DEA5ED5BB/be/99feffeb/Dictionary`2.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/7C72A31C-6717-401A-8F3A-6328E904D4C3/dc/79168b3b/IJob.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/7C72A31C-6717-401A-8F3A-6328E904D4C3/6f/1bd4c428/JobHandle.cs" root0="SKIP_HIGHLIGHTING" />
@@ -53,11 +55,13 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/93956656-A483-4524-8DE3-4C8B22BDF0A0/1c/cd917edc/OdinSelector`1.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/7C72A31C-6717-401A-8F3A-6328E904D4C3/d9/bb9ede57/ComputeBuffer.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.burst@1.3.9/Runtime/BurstCompileAttribute.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/847FBA3D-6B61-4A3B-AFA2-C3B7C7EA4785/c6/83dd7c3a/Queue`1.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/C2EFDB57-EA40-4AA5-8081-2E3A8E3AFC89/49/fdbdc9b2/Dictionary`2.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/9577AC7A-62EF-4317-9789-031239BA8798/88/8225671b/Random.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/7C72A31C-6717-401A-8F3A-6328E904D4C3/8a/4dbe3016/NativeArray`1.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/7C72A31C-6717-401A-8F3A-6328E904D4C3/42/1c066564/Color.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.mathematics@1.2.1/Unity.Mathematics/math.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://C:/Users/teemu/Documents/Games/pixel-test/Assets/WorldGrid.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/3F87D505-7260-4494-9200-1887E23EF996/db/0bb649b0/Editor.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/CACD6C6A-C61D-45CD-B58B-92E86EE53F52/d4/fdfcf7c4/ValueType.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.mathematics@1.2.1/Unity.Mathematics/int2.gen.cs" root0="SKIP_HIGHLIGHTING" />
@@ -69,6 +73,7 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/7C72A31C-6717-401A-8F3A-6328E904D4C3/61/0e22a819/SpriteRenderer.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/CACD6C6A-C61D-45CD-B58B-92E86EE53F52/28/b3fef985/Random.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.mathematics@1.2.1/Unity.Mathematics/random.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/CACD6C6A-C61D-45CD-B58B-92E86EE53F52/ed/b16716e4/IDictionary`2.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
@@ -92,6 +97,7 @@
         <option value="$PROJECT_DIR$/Assets/WaterCellImplementation.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/PlayerChunkLoader.cs" />
         <option value="$PROJECT_DIR$/Assets/WorldGrid.cs" />
+        <option value="$PROJECT_DIR$/Assets/QueueDictionary.cs" />
       </list>
     </option>
   </component>
@@ -174,7 +180,7 @@
       <workItem from="1605457682323" duration="7000" />
       <workItem from="1605457720273" duration="155000" />
       <workItem from="1605457886093" duration="66000" />
-      <workItem from="1605457971752" duration="2432000" />
+      <workItem from="1605457971752" duration="3598000" />
     </task>
     <task id="LOCAL−00001" summary="aaaaaa">
       <created>1603464344920</created>
@@ -206,7 +212,13 @@
       <option name="presentableId" value="LOCAL−00005" />
       <updated>1604599512133</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL−00006" summary="chunk loading part 1">
+      <created>1605460445219</created>
+      <option name="number" value="LOCAL−00006" />
+      <option name="presentableId" value="LOCAL−00006" />
+      <updated>1605460445219</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -233,7 +245,8 @@
     <MESSAGE value="aa" />
     <MESSAGE value="aaa" />
     <MESSAGE value="a" />
-    <option name="LAST_COMMIT_MESSAGE" value="a" />
+    <MESSAGE value="chunk loading part 1" />
+    <option name="LAST_COMMIT_MESSAGE" value="chunk loading part 1" />
   </component>
   <component name="WindowStateProjectService">
     <state x="552" y="160" key="#Plugins" timestamp="1605457950648">
@@ -312,10 +325,10 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1877" height="200" key="GridCell.Tab.3.right/0.0.1920.1040@0.0.1920.1040" timestamp="1603496311095" />
-    <state x="832" y="236" key="RiderGenerateDialog" timestamp="1603479089294">
+    <state x="832" y="236" key="RiderGenerateDialog" timestamp="1605461379298">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="832" y="236" key="RiderGenerateDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1603479089294" />
+    <state x="832" y="236" key="RiderGenerateDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1605461379298" />
     <state x="729" y="230" key="RollbackChangesDialog" timestamp="1605456958760">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
