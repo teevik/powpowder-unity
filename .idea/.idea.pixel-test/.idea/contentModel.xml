@@ -144,10 +144,12 @@
             </e>
           </e>
         </e>
-        <e p="QueueDictionary.cs" t="Include" />
         <e p="RenderChunk.compute" t="Include" />
         <e p="SandCellImplementation.cs" t="Include" />
         <e p="Scripts" t="Include">
+          <e p="DataTypes" t="Include">
+            <e p="Map.cs" t="Include" />
+          </e>
           <e p="Editor" t="Include">
             <e p="awdhawi.cs" t="Include" />
             <e p="MeshRendererInspector.cs" t="Include" />

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
+using DataTypes;
 using Drawing;
 using Extensions;
 using Unity.Burst;
@@ -77,9 +79,9 @@ public class WorldGrid : MonoBehaviour
     [SerializeField] private float simulationStep;
     [SerializeField] private ChunkBehaviour chunkPrefab;
     [SerializeField] private float pixelsPerUnit;
-    [SerializeField] private int maxChunksLoaded = 60;
     
-    private readonly QueueDictionary<int2, ChunkContainer> loadedChunks = new QueueDictionary<int2, ChunkContainer>();
+    private readonly Dictionary<int2, ChunkContainer> allChunks = new Dictionary<int2, ChunkContainer>();
+    private readonly Map<int2, ChunkContainer> loadedChunks = new Map<int2, ChunkContainer>();
     private int renderChunkKernelIndex;
     private ComputeBuffer cellTypeColorBuffer;
     private Unity.Mathematics.Random random;
@@ -89,6 +91,8 @@ public class WorldGrid : MonoBehaviour
     private unsafe int SizeOfCell => sizeof(Cell);
     private unsafe int SizeOfColor => sizeof(Color);
 
+    public IEnumerable<int2> LoadedChunkPositions => loadedChunks.Keys;
+
     public bool ChunkIsLoaded(int2 chunkPosition)
     {
         return loadedChunks.ContainsKey(chunkPosition);
@@ -96,19 +100,26 @@ public class WorldGrid : MonoBehaviour
     
     public void LoadChunk(int2 chunkPosition)
     {
+        if (allChunks.TryGetValue(chunkPosition, out var existingChunkContainer))
+        {
+            loadedChunks.Add(chunkPosition, existingChunkContainer);
+            
+            return;
+        }
+        
         var chunkRenderer = Instantiate(chunkPrefab, transform, true);
         chunkRenderer.transform.position = ChunkScale * new Vector3(chunkPosition.x, chunkPosition.y);
         chunkRenderer.transform.localScale = new Vector3(ChunkScale, ChunkScale, 1);
-        
+    
         var outputRenderTexture = new RenderTexture(ChunkSize, ChunkSize, 32)
         {
             enableRandomWrite = true,
             useMipMap = false,
             filterMode = FilterMode.Point
         };
-        
+    
         outputRenderTexture.Create();
-        
+    
         var chunk = new Chunk(Allocator.Persistent);
 
         var cellsComputeBuffer = new ComputeBuffer(chunk.Cells.Length, SizeOfCell);
@@ -134,7 +145,7 @@ public class WorldGrid : MonoBehaviour
                 }
             }
         }
-        
+    
         var chunkContainer = new ChunkContainer
         {
             Chunk = chunk,
@@ -142,10 +153,19 @@ public class WorldGrid : MonoBehaviour
             CellsComputeBuffer = cellsComputeBuffer,
             OutputRenderTexture = outputRenderTexture
         };
-        
-        loadedChunks.Enqueue(chunkPosition, chunkContainer);
+    
+        allChunks.Add(chunkPosition, chunkContainer);
+        loadedChunks.Add(chunkPosition, chunkContainer);
     }
 
+    public void UnloadChunk(int2 chunkPosition)
+    {
+        if (loadedChunks.TryGetValue(chunkPosition, out var chunkContainer))
+        {
+            loadedChunks.Remove(chunkPosition);
+        }
+    }
+    
     private void Awake()
     {
         random = new Unity.Mathematics.Random((uint) new System.Random().Next());
@@ -167,7 +187,6 @@ public class WorldGrid : MonoBehaviour
         computeShader.SetBuffer(renderChunkKernelIndex, "cell_type_colors", cellTypeColorBuffer);
         
         StartCoroutine(UpdateWorldCoroutine());
-        StartCoroutine(UnloadOldChunksCoroutine());
     }
 
     private void OnDestroy()
@@ -485,19 +504,6 @@ public class WorldGrid : MonoBehaviour
     }
     
     private readonly Chunk outOfBoundsChunk = Chunk.CreateOutOfBoundsChunk(Allocator.Persistent);
-
-    private IEnumerator UnloadOldChunksCoroutine()
-    {
-        while (true)
-        {
-            while (loadedChunks.Count > maxChunksLoaded)
-            {
-                loadedChunks.Dequeue().Dispose();
-            }
-            
-            yield return new WaitForSeconds(0.1f);
-        }
-    }
     
     private IEnumerator UpdateWorldCoroutine()
     {
@@ -573,6 +579,196 @@ public class WorldGrid : MonoBehaviour
                     if (jobHandle != null) jobHandle.Value.Complete();
                 }
             }
+
+            foreach (var chunk in loadedChunks)
+            {
+                bool findStartPoint(Chunk chunk, out Vector2 startPoint) {
+                    for(int x= 0; x< ChunkSize; x++){
+                        for(int y= 0; y< ChunkSize; y++){
+                            
+                            if(chunk.GetCell(int2(x, y)).type != CellType.None) {
+                                startPoint = new Vector2(x,y);
+                                Debug.Log("StartPoint: "+ startPoint);
+                                return true;
+                            }
+                        }
+                    }
+
+                    startPoint = default;
+                    return false; // Cannot find any start points.
+                }
+                
+                List<Vector2> getPath2(Chunk chunk, ref List<Vector2> prevPoints, Vector2 startPoint) {
+
+                    int[,] dirs = {{0,1},{1,0},{0,-1},{-1,0}};
+                    
+                    Vector2 currPoint= Vector2.zero, newPoint = Vector2.zero;
+                    bool isOpen = true; // Is the path closed?
+
+                    for(int z=0; z<dirs.GetLength(0); z++) {
+                        int i = (int)startPoint.x + dirs[z,0];
+                        int j = (int)startPoint.y + dirs[z,1];
+                        if(i<ChunkSize && i>=0 && j<ChunkSize && j>=0) {
+                            if(chunk.GetCell(int2(i, j)).type != CellType.None) {
+                                currPoint = new Vector2(i,j);
+                            }
+                        }
+                    }
+
+                    prevPoints.Add(startPoint);
+
+                    int count = 0;
+
+                    while(isOpen && count<500) {
+                        count++;
+
+                        Debug.Log(currPoint);
+
+                        prevPoints.Add(currPoint);
+			
+                        // Check each direction around the start point and repeat for each new point
+                        for(int z=0; z<dirs.GetLength(0); z++) {
+                            int i = (int)currPoint.x + dirs[z,0];
+                            int j = (int)currPoint.y + dirs[z,1];
+                            if(i<ChunkSize && i>=0 && j<ChunkSize && j>=0) {
+                                if(chunk.GetCell(int2(i, j)).type != CellType.None) {
+                                    if(!prevPoints.Contains(new Vector2(i,j))) {
+                                        newPoint = new Vector2(i,j);
+                                        break;
+                                    } else {
+                                        if(new Vector2(i,j)==startPoint) {
+                                            isOpen = false;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        if(!isOpen) continue;
+
+                        // Deadend
+                        if(newPoint==currPoint) {
+                            for(int p=prevPoints.Count-1; p>=0; p--) {
+                                for(int z=0; z<dirs.GetLength(0); z++) {
+                                    int i = (int)prevPoints[p].x + dirs[z,0];
+                                    int j = (int)prevPoints[p].y + dirs[z,1];
+                                    if(i<ChunkSize && i>=0 && j<ChunkSize && j>=0) {
+                                        if(chunk.GetCell(int2(i, j)).type != CellType.None) {
+                                            if(!prevPoints.Contains(new Vector2(i,j))) {
+                                                newPoint = new Vector2(i,j);
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                                if(newPoint!=currPoint) break;
+                            }
+                            Debug.Log("NEVER GETS PRINTED");
+                        }
+                        currPoint = newPoint;
+                    }
+                    Debug.Log("count<500?: "+count);
+                    return prevPoints;
+                }
+                
+                List<Vector2> simplifyPath(ref List<Vector2> path) {
+
+                    List<Vector2> shortPath = new List<Vector2>();
+
+                    Vector2 prevPoint = path[0];
+                    int x=(int)path[0].x, y=(int)path[0].y;
+
+                    shortPath.Add(prevPoint);
+
+                    for(int i=1; i<path.Count; i++) {
+                        // if x||y is the same as the previous x||y then we can skip that point
+                        if(x!=(int)path[i].x && y!=(int)path[i].y)
+                        {	
+                            shortPath.Add(prevPoint);
+                            x = (int)prevPoint.x;
+                            y = (int)prevPoint.y;
+
+                            if(shortPath.Count>3) { // if we have more than 3 points we can start checking if we can remove triangle points
+                                Vector2 first = shortPath[shortPath.Count-1];
+                                Vector2 last = shortPath[shortPath.Count-3];
+                                if(first.x == last.x-1 && first.y == last.y-1 ||
+                                   first.x == last.x+1 && first.y == last.y+1 ||
+                                   first.x == last.x-1 && first.y == last.y+1 ||
+                                   first.x == last.x+1 && first.y == last.y-1) {
+                                    shortPath.RemoveAt(shortPath.Count-2);
+                                }
+                            }
+                            if(shortPath.Count>3) {
+                                Vector2 first = shortPath[shortPath.Count-1];
+                                Vector2 middle = shortPath[shortPath.Count-2];
+                                Vector2 last = shortPath[shortPath.Count-3];
+
+                                if((first.x==middle.x+1&&middle.x+1==last.x+2 && first.y==middle.y+1&&middle.y+1==last.y+2) ||
+                                   (first.x==middle.x+1&&middle.x+1==last.x+2 && first.y==middle.y-1&&middle.y-1==last.y-2) ||
+                                   (first.x==middle.x-1&&middle.x-1==last.x-2 && first.y==middle.y+1&&middle.y+1==last.y+2) ||
+                                   (first.x==middle.x-1&&middle.x-1==last.x-2 && first.y==middle.y-1&&middle.y-1==last.y-2)) {
+                                    shortPath.RemoveAt(shortPath.Count-2);
+                                }
+                            }
+                        }
+                        prevPoint = path[i];
+                    }
+
+//		for(int i=1; i<shortPath.Count; i++) {
+//			// if x||y is the same as the previous x||y then we can skip that point
+//			if(x!=(int)path[i].x && y!=(int)path[i].y)
+//			{	
+//				shortPath.Add(prevPoint);
+//				x = (int)prevPoint.x;
+//				y = (int)prevPoint.y;
+//			}
+//			prevPoint = path[i];
+//		}
+
+                    return shortPath;
+                }
+
+                List<List<Vector2>> GetPaths(Chunk chunk) {
+                    List<List<Vector2>> paths = new List<List<Vector2>>();
+                    
+                    // var a = chunk.Cells.copy
+
+                    var tempChunk = chunk.Copy(Allocator.Temp);
+                    
+                    while(findStartPoint(tempChunk, out var startPoint)) {
+                        List<Vector2> points = new List<Vector2>();
+
+                        // Get vertices from outline
+                        List<Vector2> path = getPath2(tempChunk, ref points, startPoint);
+
+                        // remove points from temp
+                        foreach(Vector2 point in path) {
+                            tempChunk.SetCell(new int2((int)point.x, (int)point.y), Cell.EmptyCell);
+                        }
+                        paths.Add ( simplifyPath( ref path ) );
+//			paths.Add (  path ); //REMOVE
+
+                    }
+                    
+                    tempChunk.Dispose();
+
+                    return paths;
+                }
+                
+                var chunkContainer = chunk.Value;
+
+                if (chunk.Key.Equals(int2.zero))
+                {
+                var paths = GetPaths(chunkContainer.Chunk);
+                    
+                chunkContainer.ChunkBehaviour.UpdateCollider(paths);
+                }
+                
+                // chunkContainer.Chunk.Cells
+                // chunkContainer.ChunkBehaviour.
+            }
+
             yield return new WaitForSeconds(simulationStep);
         }
     }

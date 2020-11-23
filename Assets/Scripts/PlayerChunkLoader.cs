@@ -1,5 +1,7 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using Sirenix.OdinInspector;
+using Unity.Mathematics;
 using UnityEngine;
 using static Unity.Mathematics.math;
 
@@ -31,6 +33,27 @@ public class PlayerChunkLoader : MonoBehaviour
             var worldPosition = player.position;
             var chunkPosition = worldGrid.ChunkPosition(worldPosition);
 
+            var chunksToUnload = new List<int2>();
+            
+            foreach (var loadedChunkPosition in worldGrid.LoadedChunkPositions)
+            {
+                var isInRadius = 
+                    loadedChunkPosition.x <= chunkPosition.x + chunkLoadRadius &&
+                    loadedChunkPosition.x >= chunkPosition.x - chunkLoadRadius &&
+                    loadedChunkPosition.y <= chunkPosition.y + chunkLoadRadius &&
+                    loadedChunkPosition.y >= chunkPosition.y - chunkLoadRadius;
+                
+                if (!isInRadius)
+                {
+                    chunksToUnload.Add(loadedChunkPosition);
+                } 
+            }
+
+            foreach (var chunkToUnload in chunksToUnload)
+            {
+                worldGrid.UnloadChunk(chunkToUnload);
+            }
+            
             for (var x = -chunkLoadRadius; x <= chunkLoadRadius; x++)
             {
                 for (var y = -chunkLoadRadius; y <= chunkLoadRadius; y++)

@@ -31,11 +31,19 @@ public struct Chunk : IDisposable
     {
         return cells[cellPosition.x + (cellPosition.y * chunkSize)];
     }
-    
+
     public readonly void SetCell(int2 cellPosition, Cell cell)
     {
         var cellsCopy = cells;
         cellsCopy[cellPosition.x + (cellPosition.y * chunkSize)] = cell;
+    }
+    
+    public readonly Chunk Copy(Allocator allocator)
+    {
+        var copiedChunk = new Chunk(allocator);
+        copiedChunk.cells.CopyFrom(cells);
+
+        return copiedChunk;
     }
 
     public void Dispose()
