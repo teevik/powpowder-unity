@@ -75,6 +75,103 @@
             <e p="Xyz.cs" t="Include" />
           </e>
         </e>
+        <e p="Destructible 2D" t="Include">
+          <e p="Destructible2D.asmdef" t="Include" />
+          <e p="Examples" t="Include">
+            <e p="Fonts" t="Include">
+              <e p="OFL.txt" t="Include" />
+            </e>
+            <e p="Scripts" t="Include">
+              <e p="D2dBackground.cs" t="Include" />
+              <e p="D2dBullet.cs" t="Include" />
+              <e p="D2dCameraFlash.cs" t="Include" />
+              <e p="D2dCameraShake.cs" t="Include" />
+              <e p="D2dCarEngineSound.cs" t="Include" />
+              <e p="D2dClickToFracture.cs" t="Include" />
+              <e p="D2dClickToRead.cs" t="Include" />
+              <e p="D2dClickToSpawn.cs" t="Include" />
+              <e p="D2dClickToStamp.cs" t="Include" />
+              <e p="D2dDragToFollow.cs" t="Include" />
+              <e p="D2dDragToSlice.cs" t="Include" />
+              <e p="D2dDragToThrow.cs" t="Include" />
+              <e p="D2dExplosion.cs" t="Include" />
+              <e p="D2dFixedSpawner.cs" t="Include" />
+              <e p="D2dFlash.cs" t="Include" />
+              <e p="D2dFollow.cs" t="Include" />
+              <e p="D2dGalleryGun.cs" t="Include" />
+              <e p="D2dGalleryTarget.cs" t="Include" />
+              <e p="D2dGuide.cs" t="Include" />
+              <e p="D2dGun.cs" t="Include" />
+              <e p="D2dHealCuts.cs" t="Include" />
+              <e p="D2dLinkTo.cs" t="Include" />
+              <e p="D2dPlayerCar.cs" t="Include" />
+              <e p="D2dPlayerSnake.cs" t="Include" />
+              <e p="D2dPlayerSpaceship.cs" t="Include" />
+              <e p="D2dRandomizeSound.cs" t="Include" />
+              <e p="D2dRepeatStamp.cs" t="Include" />
+              <e p="D2dShake.cs" t="Include" />
+              <e p="D2dSlicer.cs" t="Include" />
+              <e p="D2dSpaceshipJumper.cs" t="Include" />
+              <e p="D2dSplitForce.cs" t="Include" />
+              <e p="D2dSplitSpawner.cs" t="Include" />
+              <e p="D2dSwap.cs" t="Include" />
+              <e p="D2dThruster.cs" t="Include" />
+              <e p="D2dWaypoints.cs" t="Include" />
+              <e p="D2dWheel.cs" t="Include" />
+            </e>
+          </e>
+          <e p="Resources" t="Include">
+            <e p="D2dRenderingPipeline.txt" t="Include" />
+          </e>
+          <e p="Scripts" t="Include">
+            <e p="D2dBlur.cs" t="Include" />
+            <e p="D2dCache.cs" t="Include" />
+            <e p="D2dCalculateMass.cs" t="Include" />
+            <e p="D2dCollider.cs" t="Include" />
+            <e p="D2dCollisionHandler.cs" t="Include" />
+            <e p="D2dContext.cs" t="Include" />
+            <e p="D2dDamage.cs" t="Include" />
+            <e p="D2dDestroyer.cs" t="Include" />
+            <e p="D2dDestructible.cs" t="Include" />
+            <e p="D2dDestructible_Paint.cs" t="Include" />
+            <e p="D2dDestructibleSprite.cs" t="Include" />
+            <e p="D2dDistanceField.cs" t="Include" />
+            <e p="D2dEdgeCollider.cs" t="Include" />
+            <e p="D2dEdgeSquares.cs" t="Include" />
+            <e p="D2dEditor.cs" t="Include" />
+            <e p="D2dFixture.cs" t="Include" />
+            <e p="D2dFixtureGroup.cs" t="Include" />
+            <e p="D2dFracturer.cs" t="Include" />
+            <e p="D2dHalve.cs" t="Include" />
+            <e p="D2dHelper.cs" t="Include" />
+            <e p="D2dImpactDamage.cs" t="Include" />
+            <e p="D2dImpactFissure.cs" t="Include" />
+            <e p="D2dImpactSpawner.cs" t="Include" />
+            <e p="D2dLinkedBehaviour.cs" t="Include" />
+            <e p="D2dOverlapDamage.cs" t="Include" />
+            <e p="D2dPolygonCollider.cs" t="Include" />
+            <e p="D2dPolygonSquares.cs" t="Include" />
+            <e p="D2dRect.cs" t="Include" />
+            <e p="D2dRenderingPipeline.cs" t="Include" />
+            <e p="D2dRequirements.cs" t="Include" />
+            <e p="D2dRetainVelocity.cs" t="Include" />
+            <e p="D2dSlice.cs" t="Include" />
+            <e p="D2dSnapshot.cs" t="Include" />
+            <e p="D2dSnapshotData.cs" t="Include" />
+            <e p="D2dSpawner.cs" t="Include" />
+            <e p="D2dSplitter.cs" t="Include" />
+            <e p="D2dStamp.cs" t="Include" />
+            <e p="D2dTrim.cs" t="Include" />
+          </e>
+          <e p="Shaders" t="Include">
+            <e p="Default + Color.shader" t="Include" />
+            <e p="Default.shader" t="Include" />
+            <e p="Diffuse.shader" t="Include" />
+            <e p="Keep Alpha + Color.shader" t="Include" />
+            <e p="Keep Alpha.shader" t="Include" />
+            <e p="Outline.shader" t="Include" />
+          </e>
+        </e>
         <e p="Plugins" t="Include">
           <e p="Sirenix" t="Include">
             <e p="Odin Inspector" t="Include">
@@ -162,6 +259,7 @@
         <e p="WaterCellImplementation.cs" t="Include" />
         <e p="WorldGrid.cs" t="Include" />
       </e>
+      <e p="Destructible2D.csproj" t="IncludeRecursive" />
       <e p="obj" t="ExcludeRecursive" />
       <e p="Packages" t="ExcludeRecursive" />
       <e p="pixel-test.sln" t="IncludeFlat" />

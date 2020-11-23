@@ -14,6 +14,12 @@ using Random = UnityEngine.Random;
 using static Unity.Mathematics.math;
 using int2 = Unity.Mathematics.int2;
 
+public struct Voxel2D {
+    public Vector2 position;
+    public Vector2 xEdgePosition;
+    public Vector2 yEdgePosition;
+}
+
 public struct ValueWithNeighbors<T>
 {
     public T Value;
@@ -580,191 +586,153 @@ public class WorldGrid : MonoBehaviour
                 }
             }
 
-            foreach (var chunk in loadedChunks)
+            foreach (var awdajwjd in loadedChunks)
             {
-                bool findStartPoint(Chunk chunk, out Vector2 startPoint) {
-                    for(int x= 0; x< ChunkSize; x++){
-                        for(int y= 0; y< ChunkSize; y++){
-                            
-                            if(chunk.GetCell(int2(x, y)).type != CellType.None) {
-                                startPoint = new Vector2(x,y);
-                                Debug.Log("StartPoint: "+ startPoint);
-                                return true;
-                            }
-                        }
-                    }
+                var chunkContainer = awdajwjd.Value;
+                var chunk = chunkContainer.Chunk;
 
-                    startPoint = default;
-                    return false; // Cannot find any start points.
-                }
-                
-                List<Vector2> getPath2(Chunk chunk, ref List<Vector2> prevPoints, Vector2 startPoint) {
-
-                    int[,] dirs = {{0,1},{1,0},{0,-1},{-1,0}};
-                    
-                    Vector2 currPoint= Vector2.zero, newPoint = Vector2.zero;
-                    bool isOpen = true; // Is the path closed?
-
-                    for(int z=0; z<dirs.GetLength(0); z++) {
-                        int i = (int)startPoint.x + dirs[z,0];
-                        int j = (int)startPoint.y + dirs[z,1];
-                        if(i<ChunkSize && i>=0 && j<ChunkSize && j>=0) {
-                            if(chunk.GetCell(int2(i, j)).type != CellType.None) {
-                                currPoint = new Vector2(i,j);
-                            }
-                        }
-                    }
-
-                    prevPoints.Add(startPoint);
-
-                    int count = 0;
-
-                    while(isOpen && count<500) {
-                        count++;
-
-                        Debug.Log(currPoint);
-
-                        prevPoints.Add(currPoint);
-			
-                        // Check each direction around the start point and repeat for each new point
-                        for(int z=0; z<dirs.GetLength(0); z++) {
-                            int i = (int)currPoint.x + dirs[z,0];
-                            int j = (int)currPoint.y + dirs[z,1];
-                            if(i<ChunkSize && i>=0 && j<ChunkSize && j>=0) {
-                                if(chunk.GetCell(int2(i, j)).type != CellType.None) {
-                                    if(!prevPoints.Contains(new Vector2(i,j))) {
-                                        newPoint = new Vector2(i,j);
-                                        break;
-                                    } else {
-                                        if(new Vector2(i,j)==startPoint) {
-                                            isOpen = false;
-                                            break;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        if(!isOpen) continue;
-
-                        // Deadend
-                        if(newPoint==currPoint) {
-                            for(int p=prevPoints.Count-1; p>=0; p--) {
-                                for(int z=0; z<dirs.GetLength(0); z++) {
-                                    int i = (int)prevPoints[p].x + dirs[z,0];
-                                    int j = (int)prevPoints[p].y + dirs[z,1];
-                                    if(i<ChunkSize && i>=0 && j<ChunkSize && j>=0) {
-                                        if(chunk.GetCell(int2(i, j)).type != CellType.None) {
-                                            if(!prevPoints.Contains(new Vector2(i,j))) {
-                                                newPoint = new Vector2(i,j);
-                                                break;
-                                            }
-                                        }
-                                    }
-                                }
-                                if(newPoint!=currPoint) break;
-                            }
-                            Debug.Log("NEVER GETS PRINTED");
-                        }
-                        currPoint = newPoint;
-                    }
-                    Debug.Log("count<500?: "+count);
-                    return prevPoints;
-                }
-                
-                List<Vector2> simplifyPath(ref List<Vector2> path) {
-
-                    List<Vector2> shortPath = new List<Vector2>();
-
-                    Vector2 prevPoint = path[0];
-                    int x=(int)path[0].x, y=(int)path[0].y;
-
-                    shortPath.Add(prevPoint);
-
-                    for(int i=1; i<path.Count; i++) {
-                        // if x||y is the same as the previous x||y then we can skip that point
-                        if(x!=(int)path[i].x && y!=(int)path[i].y)
-                        {	
-                            shortPath.Add(prevPoint);
-                            x = (int)prevPoint.x;
-                            y = (int)prevPoint.y;
-
-                            if(shortPath.Count>3) { // if we have more than 3 points we can start checking if we can remove triangle points
-                                Vector2 first = shortPath[shortPath.Count-1];
-                                Vector2 last = shortPath[shortPath.Count-3];
-                                if(first.x == last.x-1 && first.y == last.y-1 ||
-                                   first.x == last.x+1 && first.y == last.y+1 ||
-                                   first.x == last.x-1 && first.y == last.y+1 ||
-                                   first.x == last.x+1 && first.y == last.y-1) {
-                                    shortPath.RemoveAt(shortPath.Count-2);
-                                }
-                            }
-                            if(shortPath.Count>3) {
-                                Vector2 first = shortPath[shortPath.Count-1];
-                                Vector2 middle = shortPath[shortPath.Count-2];
-                                Vector2 last = shortPath[shortPath.Count-3];
-
-                                if((first.x==middle.x+1&&middle.x+1==last.x+2 && first.y==middle.y+1&&middle.y+1==last.y+2) ||
-                                   (first.x==middle.x+1&&middle.x+1==last.x+2 && first.y==middle.y-1&&middle.y-1==last.y-2) ||
-                                   (first.x==middle.x-1&&middle.x-1==last.x-2 && first.y==middle.y+1&&middle.y+1==last.y+2) ||
-                                   (first.x==middle.x-1&&middle.x-1==last.x-2 && first.y==middle.y-1&&middle.y-1==last.y-2)) {
-                                    shortPath.RemoveAt(shortPath.Count-2);
-                                }
-                            }
-                        }
-                        prevPoint = path[i];
-                    }
-
-//		for(int i=1; i<shortPath.Count; i++) {
-//			// if x||y is the same as the previous x||y then we can skip that point
-//			if(x!=(int)path[i].x && y!=(int)path[i].y)
-//			{	
-//				shortPath.Add(prevPoint);
-//				x = (int)prevPoint.x;
-//				y = (int)prevPoint.y;
-//			}
-//			prevPoint = path[i];
-//		}
-
-                    return shortPath;
-                }
-
-                List<List<Vector2>> GetPaths(Chunk chunk) {
-                    List<List<Vector2>> paths = new List<List<Vector2>>();
-                    
-                    // var a = chunk.Cells.copy
-
-                    var tempChunk = chunk.Copy(Allocator.Temp);
-                    
-                    while(findStartPoint(tempChunk, out var startPoint)) {
-                        List<Vector2> points = new List<Vector2>();
-
-                        // Get vertices from outline
-                        List<Vector2> path = getPath2(tempChunk, ref points, startPoint);
-
-                        // remove points from temp
-                        foreach(Vector2 point in path) {
-                            tempChunk.SetCell(new int2((int)point.x, (int)point.y), Cell.EmptyCell);
-                        }
-                        paths.Add ( simplifyPath( ref path ) );
-//			paths.Add (  path ); //REMOVE
-
-                    }
-                    
-                    tempChunk.Dispose();
-
-                    return paths;
-                }
-                
-                var chunkContainer = chunk.Value;
-
-                if (chunk.Key.Equals(int2.zero))
+                Voxel2D GetCellPositions(int2 intPosition, float size)
                 {
-                var paths = GetPaths(chunkContainer.Chunk);
-                    
-                chunkContainer.ChunkBehaviour.UpdateCollider(paths);
+                    var position = ((float2)intPosition + 0.5f) * size;
+
+                    var xEdgePosition = (float2)position + float2(size * 0.5f, 0f);
+                    var yEdgePosition = (float2)position + float2(0f, size * 0.5f);
+
+                    return new Voxel2D
+                    {
+                        position = position,
+                        xEdgePosition = xEdgePosition,
+                        yEdgePosition = yEdgePosition
+                    };
                 }
                 
+                var vertices = new List<Vector2>();
+                var triangles = new List<int>();
+
+                void AddTriangle (Vector2 a, Vector2 b, Vector2 c) {
+                    int vertexIndex = vertices.Count;
+                    vertices.Add(a);
+                    vertices.Add(b);
+                    vertices.Add(c);
+                    triangles.Add(vertexIndex);
+                    triangles.Add(vertexIndex + 1);
+                    triangles.Add(vertexIndex + 2);
+                }
+                
+                void AddQuad (Vector2 a, Vector2 b, Vector2 c, Vector2 d) {
+                    int vertexIndex = vertices.Count;
+                    vertices.Add(a);
+                    vertices.Add(b);
+                    vertices.Add(c);
+                    vertices.Add(d);
+                    triangles.Add(vertexIndex);
+                    triangles.Add(vertexIndex + 1);
+                    triangles.Add(vertexIndex + 2);
+                    triangles.Add(vertexIndex);
+                    triangles.Add(vertexIndex + 2);
+                    triangles.Add(vertexIndex + 3);
+                }
+                
+                void AddPentagon (Vector2 a, Vector2 b, Vector2 c, Vector2 d, Vector2 e) {
+                    int vertexIndex = vertices.Count;
+                    vertices.Add(a);
+                    vertices.Add(b);
+                    vertices.Add(c);
+                    vertices.Add(d);
+                    vertices.Add(e);
+                    triangles.Add(vertexIndex);
+                    triangles.Add(vertexIndex + 1);
+                    triangles.Add(vertexIndex + 2);
+                    triangles.Add(vertexIndex);
+                    triangles.Add(vertexIndex + 2);
+                    triangles.Add(vertexIndex + 3);
+                    triangles.Add(vertexIndex);
+                    triangles.Add(vertexIndex + 3);
+                    triangles.Add(vertexIndex + 4);
+                }
+
+                void TriangulateCell (int2 cellPosition, Chunk chunk)
+                {
+                    var a = chunk.GetCell(cellPosition);
+                    var b = chunk.GetCell(cellPosition + int2(1, 0));
+                    var c = chunk.GetCell(cellPosition + int2(0, 1));
+                    var d = chunk.GetCell(cellPosition + int2(1, 1));
+
+                    var cellType = 0;
+                    
+                    if (a.type != CellType.None) cellType |= 1;
+                    if (b.type != CellType.None) cellType |= 2;
+                    if (c.type != CellType.None) cellType |= 4;
+                    if (d.type != CellType.None) cellType |= 8;
+                    
+                    var voxelA = GetCellPositions(cellPosition, 1f);
+                    var voxelB = GetCellPositions(cellPosition + int2(1, 0), 1f);
+                    var voxelC = GetCellPositions(cellPosition + int2(0, 1), 1f);
+                    var voxelD = GetCellPositions(cellPosition + int2(1, 1), 1f);
+
+                    switch (cellType) {
+                        case 0:
+                            return;
+                        case 1:
+                            AddTriangle(voxelA.position, voxelA.yEdgePosition, voxelA.xEdgePosition);
+                            break;
+                        case 2:
+                            AddTriangle(voxelB.position, voxelA.xEdgePosition, voxelB.yEdgePosition);
+                            break;
+                        case 4:
+                            AddTriangle(voxelC.position, voxelC.xEdgePosition, voxelA.yEdgePosition);
+                            break;
+                        case 8:
+                            AddTriangle(voxelD.position, voxelB.yEdgePosition, voxelC.xEdgePosition);
+                            break;
+                        case 3:
+                            AddQuad(voxelA.position, voxelA.yEdgePosition, voxelB.yEdgePosition, voxelB.position);
+                            break;
+                        case 5:
+                            AddQuad(voxelA.position, voxelC.position, voxelC.xEdgePosition, voxelA.xEdgePosition);
+                            break;
+                        case 10:
+                            AddQuad(voxelA.xEdgePosition, voxelC.xEdgePosition, voxelD.position, voxelB.position);
+                            break;
+                        case 12:
+                            AddQuad(voxelA.yEdgePosition, voxelC.position, voxelD.position, voxelB.yEdgePosition);
+                            break;
+                        case 15:
+                            AddQuad(voxelA.position, voxelC.position, voxelD.position, voxelB.position);
+                            break;
+                        case 7:
+                            AddPentagon(voxelA.position, voxelC.position, voxelC.xEdgePosition, voxelB.yEdgePosition, voxelB.position);
+                            break;
+                        case 11:
+                            AddPentagon(voxelB.position, voxelA.position, voxelA.yEdgePosition, voxelC.xEdgePosition, voxelD.position);
+                            break;
+                        case 13:
+                            AddPentagon(voxelC.position, voxelD.position, voxelB.yEdgePosition, voxelA.xEdgePosition, voxelA.position);
+                            break;
+                        case 14:
+                            AddPentagon(voxelD.position, voxelB.position, voxelA.xEdgePosition, voxelA.yEdgePosition, voxelC.position);
+                            break;
+                        case 6:
+                            AddTriangle(voxelB.position, voxelA.xEdgePosition, voxelB.yEdgePosition);
+                            AddTriangle(voxelC.position, voxelC.xEdgePosition, voxelA.yEdgePosition);
+                            break;
+                        case 9:
+                            AddTriangle(voxelA.position, voxelA.yEdgePosition, voxelA.xEdgePosition);
+                            AddTriangle(voxelD.position, voxelB.yEdgePosition, voxelC.xEdgePosition);
+                            break;
+                    }
+                }
+
+                int cells = ChunkSize - 1;
+                for (var y = 0; y < cells; y++) {
+                    for (var x = 0; x < cells; x++) {
+                        TriangulateCell(
+                            int2(x, y),
+                            chunk
+                        );
+                    }
+                }
+
                 // chunkContainer.Chunk.Cells
                 // chunkContainer.ChunkBehaviour.
             }
