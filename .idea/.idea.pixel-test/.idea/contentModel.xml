@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ContentModelStore">
+    <e p="C:\Users\teemu\AppData\Local\JetBrains\Rider2020.2\extResources" t="IncludeRecursive" />
+    <e p="C:\Users\teemu\AppData\Local\JetBrains\Rider2020.2\resharper-host\Local\Transient\Rider\v202\SolutionCaches\_pixel-test.1755488702.00" t="ExcludeRecursive" />
+    <e p="C:\Users\teemu\Documents\Games\pixel-test" t="IncludeRecursive">
+      <e p="ALINE.csproj" t="IncludeRecursive" />
+      <e p="ALINEEditor.csproj" t="IncludeRecursive" />
+      <e p="ALINEPackageToolsEditor.csproj" t="IncludeRecursive" />
+      <e p="Assembly-CSharp-Editor.csproj" t="IncludeRecursive" />
+      <e p="Assembly-CSharp.csproj" t="IncludeRecursive" />
+      <e p="Assets" t="Include">
+        <e p="ALINE" t="Include">
+          <e p="ALINE.asmdef" t="Include" />
+          <e p="AlineHDRPCustomPass.cs" t="Include" />
+          <e p="AlineURPRenderPassFeature.cs" t="Include" />
+          <e p="CommandBuilder.cs" t="Include" />
+          <e p="CommandBuilderExtensions.cs" t="Include" />
+          <e p="Compatibility.cs" t="Include" />
+          <e p="Draw.cs" t="Include" />
+          <e p="DrawingData.cs" t="Include" />
+          <e p="DrawingManager.cs" t="Include" />
+          <e p="DrawingUtilities.cs" t="Include" />
+          <e p="Editor" t="Include">
+            <e p="DrawingEditor.asmdef" t="Include" />
+            <e p="DrawingManagerEditor.cs" t="Include" />
+          </e>
+          <e p="ExampleScenes" t="Include">
+            <e p="Example1_Gizmos" t="Include">
+              <e p="GizmoCharacterExample.cs" t="Include" />
+              <e p="GizmoSphereExample.cs" t="Include" />
+              <e p="TimedSpawner.cs" t="Include" />
+            </e>
+            <e p="Example2_CurveEditor" t="Include">
+              <e p="CurveEditor.cs" t="Include" />
+            </e>
+            <e p="Example3_Burst" t="Include">
+              <e p="BurstExample.cs" t="Include" />
+            </e>
+            <e p="Example4_Styling" t="Include">
+              <e p="AlineStyling.cs" t="Include" />
+            </e>
+          </e>
+          <e p="MonoBehaviourGizmos.cs" t="Include" />
+          <e p="PackageTools" t="Include">
+            <e p="Editor" t="Include">
+              <e p="DependencyCheck.cs" t="Include" />
+              <e p="PackageToolsEditor.asmdef" t="Include" />
+            </e>
+          </e>
+          <e p="Resources" t="Include">
+            <e p="aline_common.cginc" t="Include" />
+            <e p="aline_outline.shader" t="Include" />
+            <e p="aline_surface.shader" t="Include" />
+            <e p="aline_text.shader" t="Include" />
+          </e>
+          <e p="SDFFont.cs" t="Include" />
+        </e>
+        <e p="Cell.cs" t="Include" />
+        <e p="CellImplementation.cs" t="Include" />
+        <e p="CellUtils.cs" t="Include" />
+        <e p="Chunk.cs" t="Include" />
+        <e p="ChunkBehaviour.cs" t="Include" />
+        <e p="ColorPlus" t="Include">
+          <e p="Demos" t="Include">
+            <e p="Scripts for demos" t="Include">
+              <e p="Conversion.cs" t="Include" />
+              <e p="Gradients.cs" t="Include" />
+            </e>
+          </e>
+          <e p="Scripts" t="Include">
+            <e p="ColorPlus.cs" t="Include" />
+            <e p="Lab.cs" t="Include" />
+            <e p="Lch.cs" t="Include" />
+            <e p="Xyz.cs" t="Include" />
+          </e>
+        </e>
+        <e p="Plugins" t="Include">
+          <e p="Sirenix" t="Include">
+            <e p="Odin Inspector" t="Include">
+              <e p="Modules" t="Include">
+                <e p="Unity.Mathematics" t="Include">
+                  <e p="manifest.txt" t="Include" />
+                  <e p="MathematicsDrawers.cs" t="Include" />
+                  <e p="Sirenix.OdinInspector.Modules.UnityMathematics.asmdef" t="Include" />
+                </e>
+              </e>
+              <e p="Scripts" t="Include">
+                <e p="Editor" t="Include">
+                  <e p="AssemblyImportSettingsAutomation.cs" t="Include" />
+                  <e p="BuildAOTAutomation.cs" t="Include" />
+                  <e p="EnsureOdinInspectorDefine.cs" t="Include" />
+                  <e p="FixBrokenUnityObjectWrapperDrawer.cs" t="Include" />
+                  <e p="Sirenix.OdinInspector.CompatibilityLayer.Editor.asmdef" t="Include" />
+                  <e p="SyncListDrawer.cs" t="Include" />
+                  <e p="SyncVarAttributeDrawer.cs" t="Include" />
+                  <e p="Vector2IntMinMaxAttributeDrawer.cs" t="Include" />
+                  <e p="VectorIntDrawers.cs" t="Include" />
+                  <e p="VectorIntPropertyResolvers.cs" t="Include" />
+                </e>
+                <e p="SerializedNetworkBehaviour.cs" t="Include" />
+                <e p="Sirenix.OdinInspector.CompatibilityLayer.asmdef" t="Include" />
+                <e p="VectorIntFormatters.cs" t="Include" />
+              </e>
+            </e>
+            <e p="Odin Validator" t="Include">
+              <e p="Editor" t="Include">
+                <e p="Scripts" t="Include">
+                  <e p="Automation" t="Include">
+                    <e p="AutomatedValidation.cs" t="Include" />
+                    <e p="AutomatedValidationHook.cs" t="Include" />
+                    <e p="IValidationHook.cs" t="Include" />
+                    <e p="OnBuildValidationHook.cs" t="Include" />
+                    <e p="OnPlayValidationHook.cs" t="Include" />
+                    <e p="OnProjectStartupValidationHook.cs" t="Include" />
+                  </e>
+                  <e p="Editors" t="Include">
+                    <e p="ValidationOverview.cs" t="Include" />
+                    <e p="ValidationProfileEditor.cs" t="Include" />
+                    <e p="ValidationProfileEditorDrawer.cs" t="Include" />
+                    <e p="ValidationProfileManagerOverview.cs" t="Include" />
+                    <e p="ValidationProfileManagerWindow.cs" t="Include" />
+                    <e p="ValidationProfileSOCreator.cs" t="Include" />
+                    <e p="ValidationProfileTree.cs" t="Include" />
+                    <e p="ValidationRunner.cs" t="Include" />
+                  </e>
+                  <e p="Misc" t="Include">
+                    <e p="EnsureOdinValidatorDefine.cs" t="Include" />
+                  </e>
+                  <e p="Profiles" t="Include">
+                    <e p="AssetValidationProfile.cs" t="Include" />
+                    <e p="AssetValidationProfileAsset.cs" t="Include" />
+                    <e p="OdinValidationConfig.cs" t="Include" />
+                    <e p="SceneValidationProfile.cs" t="Include" />
+                    <e p="SceneValidationProfileAsset.cs" t="Include" />
+                    <e p="ValidationCollectionProfile.cs" t="Include" />
+                    <e p="ValidationCollectionProfileAsset.cs" t="Include" />
+                    <e p="ValidationProfile.cs" t="Include" />
+                    <e p="ValidationProfileAsset.cs" t="Include" />
+                  </e>
+                  <e p="Sirenix.OdinValidator.asmdef" t="Include" />
+                </e>
+              </e>
+            </e>
+          </e>
+        </e>
+        <e p="RenderChunk.compute" t="Include" />
+        <e p="SandCellImplementation.cs" t="Include" />
+        <e p="Scripts" t="Include">
+          <e p="DataTypes" t="Include">
+            <e p="Map.cs" t="Include" />
+          </e>
+          <e p="Editor" t="Include">
+            <e p="awdhawi.cs" t="Include" />
+            <e p="MeshRendererInspector.cs" t="Include" />
+          </e>
+          <e p="Extensions" t="Include">
+            <e p="ReadonlyDictionaryExtensions.cs" t="Include" />
+          </e>
+          <e p="PlayerChunkLoader.cs" t="Include" />
+          <e p="PlayerMove.cs" t="Include" />
+        </e>
+        <e p="WaterCellImplementation.cs" t="Include" />
+        <e p="WorldGrid.cs" t="Include" />
+      </e>
+      <e p="obj" t="ExcludeRecursive" />
+      <e p="Packages" t="ExcludeRecursive" />
+      <e p="pixel-test.sln" t="IncludeFlat" />
+      <e p="Sirenix.OdinInspector.CompatibilityLayer.csproj" t="IncludeRecursive" />
+      <e p="Sirenix.OdinInspector.CompatibilityLayer.Editor.csproj" t="IncludeRecursive" />
+      <e p="Sirenix.OdinInspector.Modules.UnityMathematics.csproj" t="IncludeRecursive" />
+      <e p="Sirenix.OdinValidator.csproj" t="IncludeRecursive" />
+      <e p="Temp\Bin" t="ExcludeRecursive" />
+    </e>
+  </component>
+</project>
