@@ -245,6 +245,29 @@ public class WorldGrid : MonoBehaviour
                 }
             }
         }
+        else if (Input.GetMouseButton(1))
+        {
+            var worldCursorPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+
+            var absoluteCellCursorPositionVector = Vector2Int.RoundToInt(transform.InverseTransformPoint(worldCursorPosition) * pixelsPerUnit);
+            var absoluteCellCursorPosition = int2(absoluteCellCursorPositionVector.x, absoluteCellCursorPositionVector.y) + (ChunkSize / 2);
+            
+            for (var x = -2; x < 3; x++)
+            {
+                for (var y = -2; y < 3; y++)
+                {
+                    var offsetedCursorPosition = absoluteCellCursorPosition + int2(x, y);
+                        
+                    var chunkPosition = int2(floor(offsetedCursorPosition / (float2) ChunkSize));
+                    var cellPosition = offsetedCursorPosition - (chunkPosition * ChunkSize);
+
+                    if (loadedChunks.TryGetValue(chunkPosition, out var chunkContainer))
+                    {
+                        chunkContainer.Chunk.SetCell(cellPosition, Cell.EmptyCell);
+                    }
+                }
+            }
+        }
         
         var minX = loadedChunks.Min(a => a.Key.x);
         var minY = loadedChunks.Min(a => a.Key.y);
@@ -585,158 +608,7 @@ public class WorldGrid : MonoBehaviour
                     if (jobHandle != null) jobHandle.Value.Complete();
                 }
             }
-
-            foreach (var awdajwjd in loadedChunks)
-            {
-                var chunkContainer = awdajwjd.Value;
-                var chunk = chunkContainer.Chunk;
-
-                Voxel2D GetCellPositions(int2 intPosition, float size)
-                {
-                    var position = ((float2)intPosition + 0.5f) * size;
-
-                    var xEdgePosition = (float2)position + float2(size * 0.5f, 0f);
-                    var yEdgePosition = (float2)position + float2(0f, size * 0.5f);
-
-                    return new Voxel2D
-                    {
-                        position = position,
-                        xEdgePosition = xEdgePosition,
-                        yEdgePosition = yEdgePosition
-                    };
-                }
-                
-                var vertices = new List<Vector2>();
-                var triangles = new List<int>();
-
-                void AddTriangle (Vector2 a, Vector2 b, Vector2 c) {
-                    int vertexIndex = vertices.Count;
-                    vertices.Add(a);
-                    vertices.Add(b);
-                    vertices.Add(c);
-                    triangles.Add(vertexIndex);
-                    triangles.Add(vertexIndex + 1);
-                    triangles.Add(vertexIndex + 2);
-                }
-                
-                void AddQuad (Vector2 a, Vector2 b, Vector2 c, Vector2 d) {
-                    int vertexIndex = vertices.Count;
-                    vertices.Add(a);
-                    vertices.Add(b);
-                    vertices.Add(c);
-                    vertices.Add(d);
-                    triangles.Add(vertexIndex);
-                    triangles.Add(vertexIndex + 1);
-                    triangles.Add(vertexIndex + 2);
-                    triangles.Add(vertexIndex);
-                    triangles.Add(vertexIndex + 2);
-                    triangles.Add(vertexIndex + 3);
-                }
-                
-                void AddPentagon (Vector2 a, Vector2 b, Vector2 c, Vector2 d, Vector2 e) {
-                    int vertexIndex = vertices.Count;
-                    vertices.Add(a);
-                    vertices.Add(b);
-                    vertices.Add(c);
-                    vertices.Add(d);
-                    vertices.Add(e);
-                    triangles.Add(vertexIndex);
-                    triangles.Add(vertexIndex + 1);
-                    triangles.Add(vertexIndex + 2);
-                    triangles.Add(vertexIndex);
-                    triangles.Add(vertexIndex + 2);
-                    triangles.Add(vertexIndex + 3);
-                    triangles.Add(vertexIndex);
-                    triangles.Add(vertexIndex + 3);
-                    triangles.Add(vertexIndex + 4);
-                }
-
-                void TriangulateCell (int2 cellPosition, Chunk chunk)
-                {
-                    var a = chunk.GetCell(cellPosition);
-                    var b = chunk.GetCell(cellPosition + int2(1, 0));
-                    var c = chunk.GetCell(cellPosition + int2(0, 1));
-                    var d = chunk.GetCell(cellPosition + int2(1, 1));
-
-                    var cellType = 0;
-                    
-                    if (a.type != CellType.None) cellType |= 1;
-                    if (b.type != CellType.None) cellType |= 2;
-                    if (c.type != CellType.None) cellType |= 4;
-                    if (d.type != CellType.None) cellType |= 8;
-                    
-                    var voxelA = GetCellPositions(cellPosition, 1f);
-                    var voxelB = GetCellPositions(cellPosition + int2(1, 0), 1f);
-                    var voxelC = GetCellPositions(cellPosition + int2(0, 1), 1f);
-                    var voxelD = GetCellPositions(cellPosition + int2(1, 1), 1f);
-
-                    switch (cellType) {
-                        case 0:
-                            return;
-                        case 1:
-                            AddTriangle(voxelA.position, voxelA.yEdgePosition, voxelA.xEdgePosition);
-                            break;
-                        case 2:
-                            AddTriangle(voxelB.position, voxelA.xEdgePosition, voxelB.yEdgePosition);
-                            break;
-                        case 4:
-                            AddTriangle(voxelC.position, voxelC.xEdgePosition, voxelA.yEdgePosition);
-                            break;
-                        case 8:
-                            AddTriangle(voxelD.position, voxelB.yEdgePosition, voxelC.xEdgePosition);
-                            break;
-                        case 3:
-                            AddQuad(voxelA.position, voxelA.yEdgePosition, voxelB.yEdgePosition, voxelB.position);
-                            break;
-                        case 5:
-                            AddQuad(voxelA.position, voxelC.position, voxelC.xEdgePosition, voxelA.xEdgePosition);
-                            break;
-                        case 10:
-                            AddQuad(voxelA.xEdgePosition, voxelC.xEdgePosition, voxelD.position, voxelB.position);
-                            break;
-                        case 12:
-                            AddQuad(voxelA.yEdgePosition, voxelC.position, voxelD.position, voxelB.yEdgePosition);
-                            break;
-                        case 15:
-                            AddQuad(voxelA.position, voxelC.position, voxelD.position, voxelB.position);
-                            break;
-                        case 7:
-                            AddPentagon(voxelA.position, voxelC.position, voxelC.xEdgePosition, voxelB.yEdgePosition, voxelB.position);
-                            break;
-                        case 11:
-                            AddPentagon(voxelB.position, voxelA.position, voxelA.yEdgePosition, voxelC.xEdgePosition, voxelD.position);
-                            break;
-                        case 13:
-                            AddPentagon(voxelC.position, voxelD.position, voxelB.yEdgePosition, voxelA.xEdgePosition, voxelA.position);
-                            break;
-                        case 14:
-                            AddPentagon(voxelD.position, voxelB.position, voxelA.xEdgePosition, voxelA.yEdgePosition, voxelC.position);
-                            break;
-                        case 6:
-                            AddTriangle(voxelB.position, voxelA.xEdgePosition, voxelB.yEdgePosition);
-                            AddTriangle(voxelC.position, voxelC.xEdgePosition, voxelA.yEdgePosition);
-                            break;
-                        case 9:
-                            AddTriangle(voxelA.position, voxelA.yEdgePosition, voxelA.xEdgePosition);
-                            AddTriangle(voxelD.position, voxelB.yEdgePosition, voxelC.xEdgePosition);
-                            break;
-                    }
-                }
-
-                int cells = ChunkSize - 1;
-                for (var y = 0; y < cells; y++) {
-                    for (var x = 0; x < cells; x++) {
-                        TriangulateCell(
-                            int2(x, y),
-                            chunk
-                        );
-                    }
-                }
-
-                // chunkContainer.Chunk.Cells
-                // chunkContainer.ChunkBehaviour.
-            }
-
+            
             yield return new WaitForSeconds(simulationStep);
         }
     }

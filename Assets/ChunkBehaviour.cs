@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 [RequireComponent(typeof(MeshRenderer))]
@@ -9,6 +10,7 @@ public class ChunkBehaviour : MonoBehaviour
         var meshRenderer = GetComponent<MeshRenderer>();
         meshRenderer.material.mainTexture = renderTexture;
     }
+
     //
     // public void UpdateCollider(List<List<Vector2>> paths)
     // {

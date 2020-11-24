@@ -24,9 +24,9 @@
   <component name="ChangeListManager">
     <list default="true" id="11ae6f55-283d-488c-a89b-fbda3698cb4a" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.pixel-test/.idea/contentModel.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.pixel-test/.idea/contentModel.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.pixel-test/.idea/indexLayout.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.pixel-test/.idea/indexLayout.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.pixel-test/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.pixel-test/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/ChunkBehaviour.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/ChunkBehaviour.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scenes/SampleScene.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/SampleScene.unity" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/WorldGrid.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/WorldGrid.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -43,7 +43,6 @@
     <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.mathematics@1.2.1/Unity.Mathematics/float2.gen.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/7C72A31C-6717-401A-8F3A-6328E904D4C3/c6/f261d6d8/Renderer.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/CACD6C6A-C61D-45CD-B58B-92E86EE53F52/fa/eceb0a2e/Dictionary`2.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="mock://C:/Users/teemu/Documents/Games/pixel-test/Assets/ChunkBehaviour.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/7C72A31C-6717-401A-8F3A-6328E904D4C3/dc/5ebce0f0/LayerMask.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/CACD6C6A-C61D-45CD-B58B-92E86EE53F52/7c/9c0ff672/IDictionary.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/7C72A31C-6717-401A-8F3A-6328E904D4C3/0e/bb33fb5e/Logger.cs" root0="SKIP_HIGHLIGHTING" />
@@ -64,6 +63,7 @@
     <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.burst@1.3.9/Runtime/BurstCompileAttribute.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/847FBA3D-6B61-4A3B-AFA2-C3B7C7EA4785/c6/83dd7c3a/Queue`1.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/C2EFDB57-EA40-4AA5-8081-2E3A8E3AFC89/49/fdbdc9b2/Dictionary`2.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://C:/Users/teemu/Documents/Games/pixel-test/Assets/ChunkBehaviour.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/9577AC7A-62EF-4317-9789-031239BA8798/88/8225671b/Random.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/7C72A31C-6717-401A-8F3A-6328E904D4C3/8a/4dbe3016/NativeArray`1.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/7C72A31C-6717-401A-8F3A-6328E904D4C3/42/1c066564/Color.cs" root0="SKIP_HIGHLIGHTING" />
@@ -80,9 +80,9 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/7C72A31C-6717-401A-8F3A-6328E904D4C3/2e/f4a63e39/BurstDiscardAttribute.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/7C72A31C-6717-401A-8F3A-6328E904D4C3/61/0e22a819/SpriteRenderer.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/CACD6C6A-C61D-45CD-B58B-92E86EE53F52/28/b3fef985/Random.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://C:/Users/teemu/Documents/Games/pixel-test/Assets/Chunk.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.mathematics@1.2.1/Unity.Mathematics/random.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/CACD6C6A-C61D-45CD-B58B-92E86EE53F52/ed/b16716e4/IDictionary`2.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://C:/Users/teemu/Documents/Games/pixel-test/Assets/WorldGrid.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
@@ -108,9 +108,9 @@
         <option value="$PROJECT_DIR$/Assets/Scripts/PlayerChunkLoader.cs" />
         <option value="$PROJECT_DIR$/Assets/Scripts/DataTypes/Map.cs" />
         <option value="$PROJECT_DIR$/Assets/Chunk.cs" />
-        <option value="$PROJECT_DIR$/Assets/ChunkBehaviour.cs" />
-        <option value="$PROJECT_DIR$/Assets/WorldGrid.cs" />
         <option value="$PROJECT_DIR$/Assets/Destructible 2D/Scripts/D2dCollider.cs" />
+        <option value="$PROJECT_DIR$/Assets/WorldGrid.cs" />
+        <option value="$PROJECT_DIR$/Assets/ChunkBehaviour.cs" />
       </list>
     </option>
   </component>
@@ -196,6 +196,7 @@
       <workItem from="1605457971752" duration="8115000" />
       <workItem from="1605723100380" duration="3311000" />
       <workItem from="1606154333561" duration="11946000" />
+      <workItem from="1606169492708" duration="2187000" />
     </task>
     <task id="LOCAL−00001" summary="aaaaaa">
       <created>1603464344920</created>
@@ -251,7 +252,13 @@
       <option name="presentableId" value="LOCAL−00009" />
       <updated>1606162774476</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL−00010" summary="aaa">
+      <created>1606169521567</created>
+      <option name="number" value="LOCAL−00010" />
+      <option name="presentableId" value="LOCAL−00010" />
+      <updated>1606169521568</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -276,13 +283,13 @@
     <MESSAGE value="aaaaaa" />
     <MESSAGE value="Shtuff works" />
     <MESSAGE value="aa" />
-    <MESSAGE value="aaa" />
     <MESSAGE value="a" />
     <MESSAGE value="chunk loading part 1" />
     <MESSAGE value="chunk loading part 1aaaaaaa" />
     <MESSAGE value="chunk loading part 1aaaaaaaaaaaaaa" />
     <MESSAGE value="test" />
-    <option name="LAST_COMMIT_MESSAGE" value="test" />
+    <MESSAGE value="aaa" />
+    <option name="LAST_COMMIT_MESSAGE" value="aaa" />
   </component>
   <component name="WindowStateProjectService">
     <state x="552" y="160" key="#Plugins" timestamp="1605457950648">
@@ -419,9 +426,10 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="616" y="240" key="run.anything.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1604604467778" />
-    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup" timestamp="1605727551816">
+    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup" timestamp="1606181118017">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
+    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup/0.0.1920.1040/-1920.240.1920.1040@0.0.1920.1040" timestamp="1606181118017" />
     <state x="623" y="225" width="672" height="678" key="search.everywhere.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1605727551816" />
   </component>
   <component name="XDebuggerManager">
